@@ -6,7 +6,7 @@ var _db;
 
 module.exports = {
 	connect: function() {
-		client.connect('mongodb://localhost:27017/sentence-dev', (err, db) => {
+		client.connect('mongodb://localhost:27017/sentence-dev', function(err, db) {
 			if (err) {
 				console.log("Error connecting to mongo - check mongod connection");
 				process.exit(1);
