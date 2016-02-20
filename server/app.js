@@ -28,8 +28,7 @@ io.on('connection', function(socket){
     console.log('a user connected');
 
     socket.on('getSentences', function() {
-        var sentencesCon = mongoUtil.sentences();
-        sentencesCon.find().limit( 10 ).toArray(function(err, docs){
+        mongoUtil.sentencesCon().find().limit( 10 ).toArray(function(err, docs){
             if (err) {
                 console.log(err);
             }
@@ -40,11 +39,9 @@ io.on('connection', function(socket){
 
 
     socket.on('getGame', function(){
-        var sentencesCon = mongoUtil.sentences();
-        var votesCon = mongoUtil.votes();
-        var wordsCon = mongoUtil.words();
 
-        sentencesCon.find({ "_id": mongoUtil.ObjectID(sentenceId) }).next(function(err, doc){
+        mongoUtil.sentencesCon().find({ "_id": mongoUtil.ObjectID(sentenceId) })
+        .next(function(err, doc){
             if (err) {
                 console.log(err);
             }
@@ -53,7 +50,8 @@ io.on('connection', function(socket){
             io.emit('sentence', sentence);
         });
 
-        votesCon.find({ "sentence_id": mongoUtil.ObjectID(sentenceId), completed_at: { $exists: false }}).next(function(err,doc){
+        mongoUtil.votesCon().find({ "sentence_id": mongoUtil.ObjectID(sentenceId), completed_at: { $exists: false }})
+        .next(function(err,doc){
             if (err) {
                 console.log(err);
             }
@@ -62,7 +60,8 @@ io.on('connection', function(socket){
             io.emit('vote', vote);
 
             var words = [];
-            wordsCon.find({ vote_id: mongoUtil.ObjectID(vote._id)}).toArray(function(err, docs){
+            mongoUtil.wordsCon().find({ vote_id: mongoUtil.ObjectID(vote._id)})
+            .toArray(function(err, docs){
                 if (err) {
                     console.log(err);
                 }
@@ -78,10 +77,9 @@ io.on('connection', function(socket){
     });
 
     socket.on('word submit', function(word){
-    	var words = mongoUtil.words();
     	var query = {word: word}; // Need to add "game_id" to query once added
     	var update = {$inc: {numVotes: 1}};
-    	words.findOneAndUpdate(query, update, {upsert: true}, function(err, res){
+    	mongoUtil.wordsCon().findOneAndUpdate(query, update, {upsert: true}, function(err, res){
     		if (err) {
     			console.log(err);
     		}

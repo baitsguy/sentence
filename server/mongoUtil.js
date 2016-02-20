@@ -17,17 +17,17 @@ module.exports = {
 		});
 	},
 
-	sentences: function() {
+	sentencesCon: function() {
 		console.log("Retrieving sentences collection from _db");
 		return _db.collection('sentences');
 	},
 
-	votes: function() {
+	votesCon: function() {
 		console.log("Retrieving votes collection from _db");
 		return _db.collection('votes');
 	},
 
-	words: function() {
+	wordsCon: function() {
 		console.log("Retrieving words collection from _db");
 		return _db.collection('words');
 	},
