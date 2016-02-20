@@ -2,7 +2,7 @@ var phonecatControllers = angular.module('sentencifyControllers', []);
 
 phonecatControllers.controller('GameController', ['$scope', '$routeParams',
   function($scope, $routeParams) {
-    //socket.emit('getGame');
+    socket.emit('getGame', $routeParams.sentenceId);
     $("#next-word-textbox").focus();
     $scope.submitWord = function(word) {
       console.log("Word: ", word);

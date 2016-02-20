@@ -18,27 +18,21 @@ http.listen(3000, function(){
     console.log('listening on *:3000');
 });
 
-app.get('*', function(req, res) {
-    setupDefaultSockets();
+app.get('/', function(req, res) {
     res.sendfile('./client/index.html'); // load the single view file (angular will handle the page changes on the front-end)
 });
 
 
 app.get('/home', function(req, res) {
-    setupDefaultSockets();
     res.sendfile('./client/index.html'); // load the single view file (angular will handle the page changes on the front-end)
 });
 
 app.get("/game/:sentenceId", function(request, response) {
     console.log("Sentence id: ", request.params.sentenceId);
-    setupSocket(request.params.sentenceId);
     response.sendfile('./client/index.html'); // load the single view file (angular will handle the page changes on the front-end)
 });
 
-function setupDefaultSockets() {
-    io.on('connection', function(socket){
-    console.log('a user connected');
-
+io.on('connection', function(socket){
     socket.on('getSentences', function() {
         mongoUtil.sentencesCon().find().limit( 10 ).toArray(function(err, docs){
             if (err) {
@@ -48,12 +42,8 @@ function setupDefaultSockets() {
             io.emit('sentences', docs);
         });
     });
-});
-}
-
-function setupSocket(sentenceId) {
-    io.on('connection', function(socket){
-        socket.on('getGame', function(){
+    socket.on('getGame', function(sentenceId){
+        console.log("starting game");
         var sentencesCon = mongoUtil.sentences();
         var votesCon = mongoUtil.votes();
         var wordsCon = mongoUtil.words();
@@ -95,15 +85,14 @@ function setupSocket(sentenceId) {
     });
 
     socket.on('word submit', function(word){
-    	var query = {word: word}; // Need to add "game_id" to query once added
-    	var update = {$inc: {numVotes: 1}};
-    	mongoUtil.wordsCon().findOneAndUpdate(query, update, {upsert: true}, function(err, res){
-    		if (err) {
-    			console.log(err);
-    		}
-    		console.log("Word Update: ", res);
-    	});
+        var query = {word: word}; // Need to add "game_id" to query once added
+        var update = {$inc: {numVotes: 1}};
+        mongoUtil.wordsCon().findOneAndUpdate(query, update, {upsert: true}, function(err, res){
+            if (err) {
+                console.log(err);
+            }
+            console.log("Word Update: ", res);
+        });
         console.log('Word: ' + word);
     });
 });
-}
