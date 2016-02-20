@@ -1,10 +1,12 @@
-var phonecatControllers = angular.module('sentencifyControllers', ['ngMessages']);
+var phonecatControllers = angular.module('sentencifyControllers', []);
 
 phonecatControllers.controller('HomeController', ['$scope', '$routeParams',
   function($scope, $routeParams) {
-    $scope.sentences = ["Waiting"];
-    socket.emit('getGame');
-    socket.on('sentence', function(sentence) {
-      $scope.sentences = ["hello", sentence.text];
+    io.emit('getSentences');
+    $scope.helloworld = "lala";
+    io.on('sentences', function(sentences) {
+      $scope.$apply(function() {
+        $scope.sentenceTextList = sentences;
+    });
     });
 }]);

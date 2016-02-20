@@ -18,7 +18,14 @@ http.listen(3000, function(){
     console.log('listening on *:3000');
 });
 
-app.get('/', function(req, res) {
+app.get('*', function(req, res) {
+    setupDefaultSockets();
+    res.sendfile('./client/index.html'); // load the single view file (angular will handle the page changes on the front-end)
+});
+
+
+app.get('/home', function(req, res) {
+    setupDefaultSockets();
     res.sendfile('./client/index.html'); // load the single view file (angular will handle the page changes on the front-end)
 });
 
@@ -28,9 +35,8 @@ app.get("/game/:sentenceId", function(request, response) {
     response.sendfile('./client/index.html'); // load the single view file (angular will handle the page changes on the front-end)
 });
 
-function setupSocket(sentenceId) {
+function setupDefaultSockets() {
     io.on('connection', function(socket){
-
     console.log('a user connected');
 
     socket.on('getSentences', function() {
@@ -42,9 +48,15 @@ function setupSocket(sentenceId) {
             io.emit('sentences', docs);
         });
     });
+});
+}
 
-
-    socket.on('getGame', function(){
+function setupSocket(sentenceId) {
+    io.on('connection', function(socket){
+        socket.on('getGame', function(){
+        var sentencesCon = mongoUtil.sentences();
+        var votesCon = mongoUtil.votes();
+        var wordsCon = mongoUtil.words();
 
         mongoUtil.sentencesCon().find({ "_id": mongoUtil.ObjectID(sentenceId) })
         .next(function(err, doc){
@@ -52,7 +64,6 @@ function setupSocket(sentenceId) {
                 console.log(err);
             }
             sentence = doc;
-            console.log("Emitting " + sentence);
             io.emit('sentence', sentence);
         });
 

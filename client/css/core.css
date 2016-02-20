@@ -5,9 +5,16 @@ body {
   padding:10px;
 }
 .sentence-row {
-  background-color: white;
+  background-color: #fefefe;
   padding:1em;
   margin-top:5%;
+}
+.sentence-row a {
+  text-decoration: none;
+  color:black;
+}
+.sentence-row:hover a {
+  color:#1EAEDB;
 }
 .pink {
   background-color: #ffcccc;

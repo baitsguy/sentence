@@ -1,11 +1,14 @@
 var sentencifyApp = angular.module('sentencifyApp', [
   'ngRoute',
-  'ngMessages',
   'sentencifyControllers'
 ]);
 sentencifyApp.config(['$routeProvider',
   function($routeProvider) {
     $routeProvider.
+      when('/', {
+        templateUrl: 'partials/home.html',
+        controller: 'HomeController'
+      }).
       when('/home', {
         templateUrl: 'partials/home.html',
         controller: 'HomeController'
@@ -13,8 +16,5 @@ sentencifyApp.config(['$routeProvider',
       when('/game/:sentenceId', {
         templateUrl: 'partials/game.html',
         controller: 'GameController'
-      }).
-      otherwise({
-        redirectTo: '/home'
       });
   }]);

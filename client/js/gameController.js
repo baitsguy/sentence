@@ -1,24 +1,25 @@
-var phonecatControllers = angular.module('sentencifyControllers', ['ngMessages']);
+var phonecatControllers = angular.module('sentencifyControllers', []);
 
 phonecatControllers.controller('GameController', ['$scope', '$routeParams',
   function($scope, $routeParams) {
-    socket.emit('getGame');
+    //socket.emit('getGame');
     $("#next-word-textbox").focus();
-    $scope.regex = '.* .*';
-    $scope.sentence = "This is the state of the sentence so far ";
     $scope.submitWord = function(word) {
       console.log("Word: ", word);
       socket.emit('word submit', word);
       $scope.nextWordTextbox = '';
     };
-    socket.on('words', function(words) {
-      $scope.words = words;
+    socket.once('words', function(words) {
+      $scope.$apply(function() {
+        $scope.words = words;
+      });
     });
-    socket.on('sentence', function(sentence) {
-      $scope.sentence = sentence.text + " ";
+    socket.once('sentence', function(sentence) {
+      $scope.$apply(function() {
+        $scope.sentence = sentence.text + " ";
+      });
     });
 }]);
-
 
 function submitWord() {
   $("#next-word-textbox").hide();
