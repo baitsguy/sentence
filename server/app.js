@@ -3,6 +3,8 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var sentence;
+var vote;
 
 var mongoUtil = require('./mongoUtil');
 mongoUtil.connect();
@@ -15,15 +17,28 @@ http.listen(3000, function(){
     console.log('listening on *:3000');
 });
 
-io.on('connection', function(socket){
-	var sentences = mongoUtil.sentences();
-	sentences.find().toArray(function(err,docs) {
-		if (err) {
-			console.log(err);
-		}
-		console.log(JSON.stringify(docs));
-	});
+app.get("/game/:sentenceId", function(request, response) {
+    var sentenceId = request.params.sentenceId;
 
+    var sentencesCon = mongoUtil.sentences();
+    var votesCon = mongoUtil.votes();
+    var wordsCon = mongoUtil.words();
+
+    sentence = sentencesCon.find({ "_id": sentenceId }).next();
+    vote = votesCon.find({ "sentence_id": sentenceId, completed_at: { $exists: false }}).next();
+    var wordsCursor = wordsCon.find({ vote_id: vote['id']});
+    var words = [];
+    wordsCursor.forEach(function(word) {
+        words.push(word);
+    });
+
+    response.json({ "sentence": sentence, "vote": vote, "words": words});
+});
+
+io.on('connection', function(socket){
+    if(sentence) {
+        socket.join(sentence._id.toString());
+    }
     console.log('a user connected');
 
     socket.on('disconnect', function(){
