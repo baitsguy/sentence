@@ -17,7 +17,12 @@ http.listen(3000, function(){
 
 io.on('connection', function(socket){
 	var sentences = mongoUtil.sentences();
-	console.log("Sentences: ", sentences);
+	sentences.find().toArray(function(err,docs) {
+		if (err) {
+			response.sendStatus(400);
+		}
+		console.log(JSON.stringify(docs));
+	});
 
     console.log('a user connected');
 
