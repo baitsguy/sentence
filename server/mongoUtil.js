@@ -1,8 +1,8 @@
 "use strict";
 
-let mongo = require('mongodb');
-let client = mongo.MongoClient;
-let _db;
+var mongo = require('mongodb');
+var client = mongo.MongoClient;
+var _db;
 
 module.exports = {
 	connect() {
