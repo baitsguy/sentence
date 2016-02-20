@@ -1,5 +1,13 @@
+body {
+  background-color:#f5f5fc;
+}
 .message {
   padding:10px;
+}
+.sentence-row {
+  background-color: white;
+  padding:1em;
+  margin-top:5%;
 }
 .pink {
   background-color: #ffcccc;

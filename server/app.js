@@ -13,17 +13,23 @@ mongoUtil.connect();
 app.use(express.static(__dirname + "/../client"));
 app.use('/socket', express.static(__dirname + "/../node_modules/socket.io/node_modules/socket.io-client"));
 
-require('./routes.js')(app);
+//require('./routes.js')(app);
 http.listen(3000, function(){
     console.log('listening on *:3000');
 });
 
-app.get("/game/:sentenceId", function(request, response) {
-    sentenceId = request.params.sentenceId;
-    console.log("Sentence id: ", sentenceId);
+app.get('/', function(req, res) {
+    res.sendfile('./client/index.html'); // load the single view file (angular will handle the page changes on the front-end)
 });
 
-io.on('connection', function(socket){
+app.get("/game/:sentenceId", function(request, response) {
+    console.log("Sentence id: ", request.params.sentenceId);
+    setupSocket(request.params.sentenceId);
+    response.sendfile('./client/index.html'); // load the single view file (angular will handle the page changes on the front-end)
+});
+
+function setupSocket(sentenceId) {
+    io.on('connection', function(socket){
 
     console.log('a user connected');
 
@@ -45,13 +51,14 @@ io.on('connection', function(socket){
             if (err) {
                 console.log(err);
             }
-            console.log(doc);
             sentence = doc;
+            console.log("Emitting " + sentence);
             io.emit('sentence', sentence);
         });
 
         mongoUtil.votesCon().find({ "sentence_id": mongoUtil.ObjectID(sentenceId), completed_at: { $exists: false }})
         .next(function(err,doc){
+
             if (err) {
                 console.log(err);
             }
@@ -88,3 +95,4 @@ io.on('connection', function(socket){
         console.log('Word: ' + word);
     });
 });
+}
