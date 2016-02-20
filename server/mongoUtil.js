@@ -14,5 +14,9 @@ module.exports = {
 			_db = db;
 			console.log("Connected to Mongo");
 		});
+	},
+
+	sentences: function() {
+		return _db.collection('sentences');
 	}
 };

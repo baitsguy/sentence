@@ -16,6 +16,9 @@ http.listen(3000, function(){
 });
 
 io.on('connection', function(socket){
+	var sentences = mongoUtil.sentences();
+	console.log("Sentences: ", sentences);
+
     console.log('a user connected');
 
     socket.on('disconnect', function(){
