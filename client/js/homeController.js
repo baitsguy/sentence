@@ -5,6 +5,11 @@ phonecatControllers.controller('HomeController', ['$scope', '$routeParams',
     $("#next-word-textbox").focus();
     $scope.regex = '.* .*';
     $scope.sentence = "This is the state of the sentence so far ";
+    $scope.submitWord = function(word) {
+    	console.log("Word: ", word);
+    	socket.emit('word submit', word);
+    	$scope.nextWordTextbox = '';
+    };
 }]);
 
 
