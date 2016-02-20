@@ -6,7 +6,7 @@ gulp.task("default", ["transpile"]);
 
 gulp.task("transpile", () => {
 
-  return browserify("app/app.js")
+  return browserify("js/app.js")
     .transform("babelify")
     .bundle()
     .on("error", function(error){
