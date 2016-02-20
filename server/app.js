@@ -4,7 +4,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-let mongoUtil = require('./mongoUtil');
+var mongoUtil = require('./mongoUtil');
 mongoUtil.connect();
 
 app.use(express.static(__dirname + "/../client"));
