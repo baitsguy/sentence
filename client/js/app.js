@@ -45,6 +45,7 @@
 // //       });
 var sentencifyApp = angular.module('sentencifyApp', [
   'ngRoute',
+  'ngMessages',
   'sentencifyControllers'
 ]);
 sentencifyApp.config(['$routeProvider',

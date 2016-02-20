@@ -46,7 +46,7 @@
 // //         duration: 2000,
 // //         queue: false
 // //       });
-var sentencifyApp = angular.module('sentencifyApp', ['ngRoute', 'sentencifyControllers']);
+var sentencifyApp = angular.module('sentencifyApp', ['ngRoute', 'ngMessages', 'sentencifyControllers']);
 sentencifyApp.config(['$routeProvider', function ($routeProvider) {
   $routeProvider.when('/home', {
     templateUrl: 'partials/home.html',

@@ -4,9 +4,13 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+var mongoUtil = require('./mongoUtil');
+mongoUtil.connect();
+
 app.use(express.static(__dirname + "/../client"));
 app.use('/socket', express.static(__dirname + "/../node_modules/socket.io/node_modules/socket.io-client"));
 
+require('./routes.js')(app);
 http.listen(3000, function(){
     console.log('listening on *:3000');
 });
