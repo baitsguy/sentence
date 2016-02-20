@@ -19,7 +19,7 @@ io.on('connection', function(socket){
 	var sentences = mongoUtil.sentences();
 	sentences.find().toArray(function(err,docs) {
 		if (err) {
-			response.sendStatus(400);
+			console.log(err);
 		}
 		console.log(JSON.stringify(docs));
 	});
