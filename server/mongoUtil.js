@@ -17,6 +17,17 @@ module.exports = {
 	},
 
 	sentences: function() {
+		console.log("Retrieving sentences collection from _db");
 		return _db.collection('sentences');
+	},
+
+	votes: function() {
+		console.log("Retrieving votes collection from _db");
+		return _db.collection('votes');
+	},
+
+	words: function() {
+		console.log("Retrieving words collection from _db");
+		return _db.collection('words');
 	}
 };

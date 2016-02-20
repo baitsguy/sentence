@@ -31,6 +31,15 @@ io.on('connection', function(socket){
     });
 
     socket.on('word submit', function(word){
+    	var words = mongoUtil.words();
+    	var query = {word: word}; // Need to add "game_id" to query once added
+    	var update = {$inc: {numVotes: 1}};
+    	words.findOneAndUpdate(query, update, {upsert: true}, function(err, res){
+    		if (err) {
+    			console.log(err);
+    		}
+    		console.log("Word Update: ", res);
+    	});
         console.log('Word: ' + word);
     });
 });
