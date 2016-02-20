@@ -27,6 +27,18 @@ io.on('connection', function(socket){
 
     console.log('a user connected');
 
+    socket.on('getSentences', function() {
+        var sentencesCon = mongoUtil.sentences();
+        sentencesCon.find().limit( 10 ).toArray(function(err, docs){
+            if (err) {
+                console.log(err);
+            }
+            console.log(docs);
+            io.emit('sentences', docs);
+        });
+    });
+
+
     socket.on('getGame', function(){
         var sentencesCon = mongoUtil.sentences();
         var votesCon = mongoUtil.votes();
