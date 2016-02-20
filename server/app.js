@@ -5,11 +5,12 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 app.use(express.static(__dirname + "/../client"));
+app.use('/socket', express.static(__dirname + "/../node_modules/socket.io/node_modules/socket.io-client"));
+
+http.listen(3000, function(){
+    console.log('listening on *:3000');
+});
 
 io.on('connection', function(socket){
     console.log('a user connected');
-});
-
-app.listen(3000, function(){
-    console.log('listening on *:3000');
 });
