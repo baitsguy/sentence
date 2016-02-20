@@ -25,45 +25,41 @@ app.get("/game/:sentenceId", function(request, response) {
 
 io.on('connection', function(socket){
 
-
-    if(sentenceId) {
-        socket.join(sentenceId);
-    }
-
-    var sentencesCon = mongoUtil.sentences();
-    var votesCon = mongoUtil.votes();
-    var wordsCon = mongoUtil.words();
-
-    sentencesCon.find({ "_id": mongoUtil.ObjectID(sentenceId) }).next(function(err, doc){
-		if (err) {
-			console.log(err);
-		}
-		console.log(doc);
-		sentence = doc;
-		io.emit('sentence', sentence);
-    });
-
-	votesCon.find({ "sentence_id": mongoUtil.ObjectID(sentenceId), completed_at: { $exists: false }}).next(function(err,doc){
-		if (err) {
-			console.log(err);
-		}
-		console.log(doc);
-		vote = doc;
-		io.emit('vote', vote);
-
-		var words = [];
-		wordsCon.find({ vote_id: mongoUtil.ObjectID(vote._id)}).toArray(function(err, docs){
-			if (err) {
-				console.log(err);
-			}
-			console.log(docs);
-			words = docs;
-			io.emit('words', words);
-		});
-	});
-
-
     console.log('a user connected');
+
+    socket.on('getGame', function(){
+        var sentencesCon = mongoUtil.sentences();
+        var votesCon = mongoUtil.votes();
+        var wordsCon = mongoUtil.words();
+
+        sentencesCon.find({ "_id": mongoUtil.ObjectID(sentenceId) }).next(function(err, doc){
+            if (err) {
+                console.log(err);
+            }
+            console.log(doc);
+            sentence = doc;
+            io.emit('sentence', sentence);
+        });
+
+        votesCon.find({ "sentence_id": mongoUtil.ObjectID(sentenceId), completed_at: { $exists: false }}).next(function(err,doc){
+            if (err) {
+                console.log(err);
+            }
+            console.log(doc);
+            vote = doc;
+            io.emit('vote', vote);
+
+            var words = [];
+            wordsCon.find({ vote_id: mongoUtil.ObjectID(vote._id)}).toArray(function(err, docs){
+                if (err) {
+                    console.log(err);
+                }
+                console.log(docs);
+                words = docs;
+                io.emit('words', words);
+            });
+        });
+    });
 
     socket.on('disconnect', function(){
         console.log('user disconnected');
