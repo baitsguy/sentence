@@ -2,6 +2,7 @@
 
 var mongo = require('mongodb');
 var client = mongo.MongoClient;
+var ObjectID = mongo.ObjectID;
 var _db;
 
 module.exports = {
@@ -29,5 +30,9 @@ module.exports = {
 	words: function() {
 		console.log("Retrieving words collection from _db");
 		return _db.collection('words');
+	},
+
+	ObjectID: function(idStr) {
+		return ObjectID(idStr);
 	}
 };

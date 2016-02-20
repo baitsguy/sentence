@@ -5,6 +5,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var sentence;
 var vote;
+var sentenceId;
 
 var mongoUtil = require('./mongoUtil');
 mongoUtil.connect();
@@ -18,27 +19,50 @@ http.listen(3000, function(){
 });
 
 app.get("/game/:sentenceId", function(request, response) {
-    var sentenceId = request.params.sentenceId;
+    sentenceId = request.params.sentenceId;
+    console.log("Sentence id: ", sentenceId);
+});
+
+io.on('connection', function(socket){
+
+
+    if(sentenceId) {
+        socket.join(sentenceId);
+    }
 
     var sentencesCon = mongoUtil.sentences();
     var votesCon = mongoUtil.votes();
     var wordsCon = mongoUtil.words();
 
-    sentence = sentencesCon.find({ "_id": sentenceId }).next();
-    vote = votesCon.find({ "sentence_id": sentenceId, completed_at: { $exists: false }}).next();
-    var wordsCursor = wordsCon.find({ vote_id: vote['id']});
-    var words = [];
-    wordsCursor.forEach(function(word) {
-        words.push(word);
+    sentencesCon.find({ "_id": mongoUtil.ObjectID(sentenceId) }).next(function(err, doc){
+		if (err) {
+			console.log(err);
+		}
+		console.log(doc);
+		sentence = doc;
+		io.emit('sentence', sentence);
     });
 
-    response.json({ "sentence": sentence, "vote": vote, "words": words});
-});
+	votesCon.find({ "sentence_id": mongoUtil.ObjectID(sentenceId), completed_at: { $exists: false }}).next(function(err,doc){
+		if (err) {
+			console.log(err);
+		}
+		console.log(doc);
+		vote = doc;
+		io.emit('vote', vote);
 
-io.on('connection', function(socket){
-    if(sentence) {
-        socket.join(sentence._id.toString());
-    }
+		var words = [];
+		wordsCon.find({ vote_id: mongoUtil.ObjectID(vote._id)}).toArray(function(err, docs){
+			if (err) {
+				console.log(err);
+			}
+			console.log(docs);
+			words = docs;
+			io.emit('words', words);
+		});
+	});
+
+
     console.log('a user connected');
 
     socket.on('disconnect', function(){
