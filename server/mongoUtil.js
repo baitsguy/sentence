@@ -5,7 +5,7 @@ var client = mongo.MongoClient;
 var _db;
 
 module.exports = {
-	connect() {
+	connect: function() {
 		client.connect('mongodb://localhost:27017/sentence-dev', (err, db) => {
 			if (err) {
 				console.log("Error connecting to mongo - check mongod connection");
@@ -15,4 +15,4 @@ module.exports = {
 			console.log("Connected to Mongo");
 		});
 	}
-}
+};
