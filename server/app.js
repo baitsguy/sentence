@@ -1,6 +1,7 @@
 "use strict";
 var express = require('express');
 var app = express();
+var http = require('http').server(app);
 var io = require('socket.io')(http);
 
 app.get('/', function(req, res){
