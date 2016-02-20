@@ -1,0 +1,26 @@
+[
+	{ 
+		"_id" : ObjectId("56c8a2415a04bd5d8351bc6c"),
+		"word" : "This",
+		"numVotes" : 1,
+		"vote_id" : ObjectId("56c8a05875525ebb34ae9d57")
+	},
+	{
+		"_id" : ObjectId("56c8a2415a04bd5d8351bc6d"),
+		"word" : "is",
+		"numVotes" : 1,
+		"vote_id" : ObjectId("56c8a05875525ebb34ae9d57")
+	},
+	{
+		"_id" : ObjectId("56c8a2435a04bd5d8351bc6f"),
+		"word" : "word",
+		"numVotes" : 5,
+		"vote_id" : ObjectId("56c8a05875525ebb34ae9d57")
+	},
+	{
+		"_id" : ObjectId("56c8a2425a04bd5d8351bc6e"),
+		"word" : "a",
+		"numVotes" : 2,
+		"vote_id" : ObjectId("56c8a05875525ebb34ae9d57")
+	}
+]

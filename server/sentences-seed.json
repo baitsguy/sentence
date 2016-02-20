@@ -1,0 +1,8 @@
+[
+	{ 
+		"_id" : ObjectId("56c85b9775525ebb34ae9d55"),
+		"text" : "Hello it's me",
+		"createdAt" : ISODate("2016-02-20T12:27:03.507Z"),
+		"lastModified" : ISODate("2016-02-20T12:27:03.507Z")
+	}
+]
