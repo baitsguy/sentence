@@ -55,7 +55,7 @@ module.exports = {
 
     createSentence: function(callback) {
         var _this = this;
-        _db.collection('sentences').insertOne({createdAt: new Date()}, function(err, result){
+        _db.collection('sentences').insertOne({createdAt: new Date(), text: ''}, function(err, result){
             if (err) {
                 console.log(err);
             }
