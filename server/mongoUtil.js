@@ -34,5 +34,32 @@ module.exports = {
 
 	ObjectID: function(idStr) {
 		return ObjectID(idStr);
-	}
+	},
+
+	setVoteCompletedAt: function(sentenceId) {
+		var query = { sentence_id: ObjectID(sentenceId), completedAt: {$exists: false}};
+        var update = {$set: {completedAt: new Date()}};
+        console.log("Querying with: ", query);
+        console.log("Then running update: ", update);
+        _db.collection('votes').findOneAndUpdate(query, update, {});
+	},
+
+    setWinningWordForVote: function(wordId, sentenceId) {
+	    var query = {sentence_id: ObjectID(sentenceId)};
+	    var update = {$set: {winningWord: ObjectID(wordId)}};
+	    console.log("Setting winning word with id: ", wordId);
+	    _db.collection('votes').findOneAndUpdate(query, update, {});
+    },
+
+    createNewVote: function(sentenceId) {
+        _db.collection('votes').insertOne({ sentence_id: ObjectID(sentenceId), createdAt: new Date()}, function(err, result){
+            if (err) {
+                console.log(err);
+            }
+            _db.collection('votes').find({_id: result.insertedId})
+            .next(function(err, vote){
+                console.log("Result of insert: ", vote);
+            });
+        });
+    }
 };
