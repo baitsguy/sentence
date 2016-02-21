@@ -158,7 +158,7 @@ module.exports = {
             if(voter) {
                 callback(sentenceId);
             } else {
-                _this.insertWord(sentenceId, voteId, word, callback);
+                _this.insertWord(sentenceId, voteId, word, ip, callback);
             }
         });
     },
