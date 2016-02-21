@@ -7,6 +7,16 @@ h1 {
 h1, h2, h3, h4 {
   font-family: Lora;
 }
+.tag a {
+  font-family: Lora;
+  text-decoration: none;
+  margin:0.1em;
+  color:#333;
+}
+.tag a:hover {
+  color:#333;
+  color:#1EAEDB;
+}
 .message {
   padding:10px;
 }

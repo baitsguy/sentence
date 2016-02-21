@@ -8,7 +8,7 @@
 
   <div id="form" class="row" style="margin-top: 10%">
       <form name="wordForm" ng-submit="wordForm.$valid && submitWord(nextWordTextbox)">
-        <input class="u-full-width" name="nextWordTextbox" type="text" placeholder="Enter a word" ng-model="nextWordTextbox" required ng-pattern="/()(^\s*\S+\s*$)/">
+        <input class="u-full-width" name="nextWordTextbox" type="text" placeholder="Enter a word" ng-model="nextWordTextbox" required ng-pattern="/()(^\s*\S+\s*$)/" id="nextWordTextbox">
         <div class="row message" ng-class="{'pink':!wordForm.nextWordTextbox.$valid}" ng-show="!wordForm.nextWordTextbox.$valid && !wordForm.nextWordTextbox.$pristine">
           Words can only contain letters and numbers. No whitespace or special characters.
         </div>
@@ -21,7 +21,7 @@
 
  <div class="row" style="margin-top: 10%">
   <span ng:repeat="(index, value) in words">
-      <div class="row" style="font-size: {{value.size}}em">{{value.word}}</div>
+      <span class="tag" style="font-size: {{value.size}}em"><a href="" ng-click="populateWord(value.word)">{{value.word}}</a></span>
   </span>
  </div>
 </div>
