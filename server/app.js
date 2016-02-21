@@ -65,11 +65,11 @@ function emitGameObject(objTypeStr, object) {
     } else {
         io.emit(objTypeStr);
     }
-};
+}
 
 function resetTimer(sentenceId) {
     job = scheduler.scheduleNextVoteEnd(sentenceId, voteEnd);
-};
+}
 
 function voteEnd(sentenceId){
     console.log("Voting Ended!");
@@ -79,8 +79,8 @@ function voteEnd(sentenceId){
     // Check votes and append highest vote to current sentence
     mongoUtil.setVoteCompletedAt(sentenceId);
     mongoUtil.voteEnd(sentenceId, isEndOfGame, resetTimer, emitGameObject);
-};
+}
 
 function sendDetailsForSentences(sentenceId) {
     mongoUtil.getSentenceDetails(sentenceId, emitGameObject);
-};
+}
