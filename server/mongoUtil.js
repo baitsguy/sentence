@@ -147,33 +147,17 @@ module.exports = {
         });
     },
 
-    voteEnd: function(sentenceId, isGameEnd, timerCallback, emitCallback) {
+    voteEnd: function(sentenceId, isGameEnd, callback) {
     	var _this = this;
 	    _db.collection('votes').find({ sentence_id: ObjectID(sentenceId) }).sort({completedAt: -1}).limit(1)
 	    .next(function(err, vote){
 	        _db.collection('words').find({vote_id: ObjectID(vote._id)}).sort({numVotes: -1}).limit(1)
 	        .next(function(err, word){
-	            console.log("Returned word: ", word);
-	            if (err) {
-	                console.log(err);
-	            }
-
-	            if (!word) {
-	                isGameEnd = true;
-	            } else {
-	                _this.setWinningWordForVote(word._id, sentenceId);
-	                _this.appendWinningWordToSentence(word.word, sentenceId, emitCallback);
-	            }
-
-	            // Check if end of game
-	            if (isGameEnd) {
-	                _this.endGame(sentenceId, emitCallback);
-	                emitCallback('game end');
-	            } else {
-	                _this.createNewVote(sentenceId);
-	                timerCallback(sentenceId);
-	                emitCallback('vote start');
-	            }
+                console.log("Returned word: ", word);
+                if (err) {
+                    console.log(err);
+                }
+                callback(sentenceId, word, isGameEnd);
 	        });
 	    });
     }

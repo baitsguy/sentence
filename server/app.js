@@ -78,7 +78,26 @@ function voteEnd(sentenceId){
     var isEndOfGame = false;
     // Check votes and append highest vote to current sentence
     mongoUtil.setVoteCompletedAt(sentenceId);
-    mongoUtil.voteEnd(sentenceId, isEndOfGame, resetTimer, emitGameObject);
+    mongoUtil.voteEnd(sentenceId, isEndOfGame, nextRound);
+}
+
+function nextRound(sentenceId, word, isGameEnd) {
+    if (!word) {
+        isGameEnd = true;
+    } else {
+        mongoUtil.setWinningWordForVote(word._id, sentenceId);
+        mongoUtil.appendWinningWordToSentence(word.word, sentenceId, emitGameObject);
+    }
+
+    // Check if end of game
+    if (isGameEnd) {
+        mongoUtil.endGame(sentenceId, emitGameObject);
+        emitGameObject('game end');
+    } else {
+        mongoUtil.createNewVote(sentenceId);
+        resetTimer(sentenceId);
+        emitGameObject('vote start');
+    }
 }
 
 function sendDetailsForSentences(sentenceId) {
