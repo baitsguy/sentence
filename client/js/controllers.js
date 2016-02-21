@@ -2,12 +2,18 @@ var app = angular.module('sentencifyControllers', ['ngRoute']);
 
 app.controller('HomeController', ['$scope', '$routeParams', '$window',
   function($scope, $routeParams, $window) {
+    var socket = io();
     console.log("called home controller");
     socket.emit('get sentences');
     $scope.helloworld = "lala";
     socket.on('sentences', function(sentences) {
       $scope.$apply(function() {
         $scope.sentenceTextList = sentences;
+      });
+    });
+    socket.on('new sentence', function(sentenceId) {
+      $scope.$apply(function() {
+        $scope.sentenceTextList.push({value:sentenceId});
       });
     });
 
@@ -18,6 +24,8 @@ app.controller('HomeController', ['$scope', '$routeParams', '$window',
 
 app.controller('GameController', ['$scope', '$http', '$routeParams',
   function($scope, $http, $routeParams) {
+    //var socket = io($routeParams.sentenceId);
+    var socket = io();
     console.log("called game controller");
     $("#form").hide();
     $("#tags").hide();
