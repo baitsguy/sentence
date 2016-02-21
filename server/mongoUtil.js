@@ -23,7 +23,7 @@ module.exports = {
 		return ObjectID(idStr);
 	},
 
-	setVoteCompletedAt: function(sentenceId) {
+	setVoteDone: function(sentenceId) {
 		var query = { sentence_id: ObjectID(sentenceId), voteDone: {$exists: false}};
         var update = {$set: {voteDone: true}};
         console.log("Querying with: ", query);

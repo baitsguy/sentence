@@ -76,7 +76,7 @@ function voteEnd(sentenceId){
     io.emit('vote end');
     var isEndOfGame = false;
     // Check votes and append highest vote to current sentence
-    mongoUtil.setVoteCompletedAt(sentenceId);
+    mongoUtil.setVoteDone(sentenceId);
     mongoUtil.voteEnd(sentenceId, isEndOfGame, nextRound);
 }
 
