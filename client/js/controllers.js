@@ -1,15 +1,19 @@
 var app = angular.module('sentencifyControllers', ['ngRoute']);
 
-app.controller('HomeController', ['$scope', '$routeParams',
-  function($scope, $routeParams) {
+app.controller('HomeController', ['$scope', '$routeParams', '$window',
+  function($scope, $routeParams, $window) {
     console.log("called home controller");
     socket.emit('getSentences');
     $scope.helloworld = "lala";
     socket.on('sentences', function(sentences) {
       $scope.$apply(function() {
         $scope.sentenceTextList = sentences;
+      });
     });
-    });
+
+    $scope.createGame = function() {
+      socket.emit('create game');
+    };
 }]);
 
 app.controller('GameController', ['$scope', '$routeParams',

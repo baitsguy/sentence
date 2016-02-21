@@ -39,13 +39,11 @@ io.on('connection', function(socket){
 
     socket.on('create game', function(){
         console.log("creating a game");
-        mongoUtil.createSentence(emitGameObject);
+        mongoUtil.createSentence(gameStart);
     });
 
     socket.on('getGame', function(sentenceId){
         console.log("starting game");
-
-        resetTimer(sentenceId);
         sendDetailsForSentences(sentenceId);
     });
 
@@ -94,12 +92,20 @@ function nextRound(sentenceId, word, isGameEnd) {
         mongoUtil.endGame(sentenceId, emitGameObject);
         emitGameObject('game end');
     } else {
-        mongoUtil.createNewVote(sentenceId);
-        resetTimer(sentenceId);
-        emitGameObject('vote start');
+        mongoUtil.createNewVote(sentenceId, voteStart);
     }
 }
 
 function sendDetailsForSentences(sentenceId) {
     mongoUtil.getSentenceDetails(sentenceId, emitGameObject);
+}
+
+function gameStart(sentenceId) {
+    resetTimer(sentenceId);
+    emitGameObject('new sentence', sentenceId);
+}
+
+function voteStart(sentenceId) {
+    resetTimer(sentenceId);
+    emitGameObject('vote start');
 }

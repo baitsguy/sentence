@@ -36,7 +36,7 @@ module.exports = {
 	    _db.collection('votes').findOneAndUpdate(query, update, {});
     },
 
-    createNewVote: function(sentenceId) {
+    createNewVote: function(sentenceId, callback) {
         _db.collection('votes').insertOne({ sentence_id: ObjectID(sentenceId), createdAt: new Date()}, function(err, result){
             if (err) {
                 console.log(err);
@@ -45,6 +45,7 @@ module.exports = {
             .next(function(err, vote){
                 console.log("Result of insert: ", vote);
             });
+            callback(sentenceId);
         });
     },
 
@@ -54,8 +55,7 @@ module.exports = {
             if (err) {
                 console.log(err);
             }
-            callback('new sentence', result.insertedId);
-            _this.createNewVote(result.insertedId);
+            _this.createNewVote(result.insertedId, callback);
         });
     },
 

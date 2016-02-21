@@ -3,6 +3,12 @@
         <h1>{{title}}</h1>
     </div>
     
+    <div class="row">
+      <form class="form" name="newSentenceForm" ng-submit="createGame()">
+        <input class="btn" type="submit" value="Create Sentence" />
+      </form>
+    </div>
+
     <div class="row sentence-row" ng:repeat="(index, value) in sentenceTextList">
       <a ng-href="/game/{{value._id}}">
         <div class="row">
