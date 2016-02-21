@@ -57,15 +57,12 @@ io.on('connection', function(socket){
     }
 
     function emitGameObject(objTypeStr, object) {
-        console.log(objTypeStr + " object: ", sentence);
+        console.log(objTypeStr + " object: ", object);
         io.emit(objTypeStr, object);
     }
 
     function resetTimer(sentenceId) {
-        var voteEndDate = scheduler.getNextVoteEnd();
-        job = scheduler.scheduleJob(voteEndDate, function(){
-            voteEnd(sentenceId);
-        });
+        job = scheduler.scheduleNextVoteEnd(sentenceId, voteEnd);
     }
 
     function voteEnd(sentenceId){
@@ -112,10 +109,7 @@ io.on('connection', function(socket){
     socket.on('getGame', function(sentenceId){
         console.log("starting game");
 
-        var voteEndDate = scheduler.getNextVoteEnd();
-        job = scheduler.scheduleJob(voteEndDate, function(){
-        	voteEnd(sentenceId);
-        });
+        resetTimer(sentenceId);
         sendDetailsForSentences(sentenceId);
     });
 

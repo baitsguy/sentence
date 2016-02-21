@@ -14,5 +14,10 @@ module.exports = {
 	    return nextVoteEnd;
 	},
 
-	scheduleJob: schedule.scheduleJob
+	scheduleNextVoteEnd: function(sentenceId, callback){
+		var nextVoteEnd = this.getNextVoteEnd();
+		return schedule.scheduleJob(nextVoteEnd, function(){
+			callback(sentenceId);
+		});
+	}
 };
