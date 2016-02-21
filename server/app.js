@@ -3,9 +3,6 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var sentence;
-var vote;
-var sentenceId;
 var job;
 
 var mongoUtil = require('./mongoUtil');
