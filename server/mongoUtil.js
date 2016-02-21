@@ -99,6 +99,7 @@ module.exports = {
             if (err) {
                 console.log(err);
             }
+            
             console.log(sentences);
             callback('sentences', sentences);
         });
