@@ -109,37 +109,6 @@ io.on('connection', function(socket){
         sendDetailsForSentences(sentenceId);
     });
 
-    socket.on('vote end', function(sentenceId){
-    	// Check votes and append highest vote to current sentence
-    	// and set vote.winningWord, completedAt
-
-    	// Check if end of game
-    	var isEndOfGame = false;
-    	if (isEndOfGame) {
-	    	//	If end -> set sentence.completedAt, emit game end with final sentence
-	    	var query = { _id: mongoUtil.ObjectID(sentenceId) };
-	    	var update = {$set: {completedAt: new Date()}};
-	    	var text = mongoUtil.sentencesCon().findAndModify(query, [], update, {}, function(err, doc){
-	    		if (err) {
-	    			console.log(err);
-	    		}
-	    		console.log("Doc is: ", doc.value.text);
-	    		io.emit('game end', doc.value.text);
-	    	});
-	    } else {
-	    	// Else -> create new vote, reset timer
-	    	mongoUtil.votesCon().insertOne({ sentence_id: mongoUtil.ObjectID(sentenceId), createdAt: new Date()}, function(err, result){
-	    		if (err) {
-	    			console.log(err);
-	    		}
-	    		mongoUtil.votesCon().find({_id: result.insertedId})
-	    		.next(function(err, vote){
-	    			console.log("Result of insert: ", vote);
-	    		});
-	    	});
-	    }
-    });
-
     function sendDetailsForSentences(sentenceId) {
         mongoUtil.sentencesCon().find({ "_id": mongoUtil.ObjectID(sentenceId) })
         .next(function(err, doc){
