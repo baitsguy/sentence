@@ -59,24 +59,61 @@ io.on('connection', function(socket){
         });
     }
 
-    function voteEnd(sentenceId){
-    	console.log("Voting Ended!");
-        job.cancel();
-        var isEndOfGame = false;
-    	// Check votes and append highest vote to current sentence
-    	// and set vote.winningWord, completedAt
+    function setWinningWordForVote(wordId, sentenceId) {
+        var query = {sentence_id: mongoUtil.ObjectID(sentenceId)};
+        var update = {$set: {winningWord: mongoUtil.ObjectID(wordId)}};
+        console.log("Setting winning word with id: ", wordId);
+        mongoUtil.votesCon().findOneAndUpdate(query, update, {});
+    }
+
+    function appendWinningWordToSentence(word, sentenceId) {
+        var query = {_id: mongoUtil.ObjectID(sentenceId)};
+        mongoUtil.sentencesCon().find(query).limit(1)
+        .next(function(err, sentence){
+            console.log("Sentence before append: ", sentence);
+            var nextSent = sentence.text + " " + word;
+            io.emit('update sentance', nextSent);
+            var update = {$set: {text: nextSent}};
+            mongoUtil.sentencesCon().findOneAndUpdate(query,update, {});
+        });
+    }
+
+    function createNewVote(sentenceId) {
+        mongoUtil.votesCon().insertOne({ sentence_id: mongoUtil.ObjectID(sentenceId), createdAt: new Date()}, function(err, result){
+            if (err) {
+                console.log(err);
+            }
+            mongoUtil.votesCon().find({_id: result.insertedId})
+            .next(function(err, vote){
+                console.log("Result of insert: ", vote);
+            });
+        });
+    }
+
+    function resetTimer(sentenceId) {
+        var voteEndDate = scheduler.getNextVoteEnd();
+        job = scheduler.scheduleJob(voteEndDate, function(){
+            voteEnd(sentenceId);
+        });
+    }
+
+    function setVoteCompletedAt(sentenceId) {
         var query = { sentence_id: mongoUtil.ObjectID(sentenceId), completedAt: {$exists: false}};
         var update = {$set: {completedAt: new Date()}};
         console.log("Querying with: ", query);
         console.log("Then running update: ", update);
         mongoUtil.votesCon().findOneAndUpdate(query, update, {});
-        query = { sentence_id: mongoUtil.ObjectID(sentenceId) }
-        console.log("Querying with: ", query);
-        mongoUtil.votesCon().find(query).sort({completedAt: -1}).limit(1)
+    }
+
+    function voteEnd(sentenceId){
+    	console.log("Voting Ended!");
+        job.cancel();
+        var isEndOfGame = false;
+    	// Check votes and append highest vote to current sentence
+        setVoteCompletedAt(sentenceId);
+        mongoUtil.votesCon().find({ sentence_id: mongoUtil.ObjectID(sentenceId) }).sort({completedAt: -1}).limit(1)
         .next(function(err, vote){
-            console.log("Querying with vote_id: ", vote._id);
-            query = {vote_id: mongoUtil.ObjectID(vote._id)};
-            mongoUtil.wordsCon().find(query).sort({numVotes: -1}).limit(1)
+            mongoUtil.wordsCon().find({vote_id: mongoUtil.ObjectID(vote._id)}).sort({numVotes: -1}).limit(1)
             .next(function(err, word){
                 console.log("Returned word: ", word);
                 if (err) {
@@ -86,44 +123,16 @@ io.on('connection', function(socket){
                 if (!word) {
                     isEndOfGame = true;
                 } else {
-                    query = {sentence_id: mongoUtil.ObjectID(sentenceId)};
-                    update = {$set: {winningWord: mongoUtil.ObjectID(word._id)}};
-                    console.log("Querying with: ", query);
-                    console.log("Then running update: ", update);
-                    mongoUtil.votesCon().findOneAndUpdate(query, update, {});
-
-                    query = {_id: mongoUtil.ObjectID(sentenceId)};
-                    console.log("Querying with: ", query);
-                    mongoUtil.sentencesCon().find(query).limit(1)
-                    .next(function(err, sentence){
-                        console.log("Query for sentence: ", sentence);
-                        var nextSent = sentence.text + " " + word.word;
-                        io.emit('update sentance', nextSent);
-                        update = {$set: {text: nextSent}};
-                        mongoUtil.sentencesCon().findOneAndUpdate(query,update, {});
-                    });
+                    setWinningWordForVote(word._id, sentenceId);
+                    appendWinningWordToSentence(word.word, sentenceId);
                 }
 
                 // Check if end of game
                 if (isEndOfGame) {
-                    //  If end -> set sentence.completedAt, emit game end with final sentence
                     endGame(sentenceId);
                 } else {
-                    // Else -> create new vote, reset timer
-                    mongoUtil.votesCon().insertOne({ sentence_id: mongoUtil.ObjectID(sentenceId), createdAt: new Date()}, function(err, result){
-                        if (err) {
-                            console.log(err);
-                        }
-                        mongoUtil.votesCon().find({_id: result.insertedId})
-                        .next(function(err, vote){
-                            console.log("Result of insert: ", vote);
-                        });
-                    });
-
-                    var voteEndDate = scheduler.getNextVoteEnd();
-                    job = scheduler.scheduleJob(voteEndDate, function(){
-                        voteEnd(sentenceId);
-                    });
+                    createNewVote(sentenceId);
+                    resetTimer(sentenceId);
                 }
             });
         });

@@ -9,7 +9,7 @@ module.exports = {
 
 	getNextVoteEnd: function() {
 		var dateNow = new Date();
-	    var nextVoteEnd = new Date(dateNow.getTime() + (60000));
+	    var nextVoteEnd = new Date(dateNow.getTime() + (15000));
 	    console.log("Scheduling next vote end for: ", formatDate(nextVoteEnd));
 	    return nextVoteEnd;
 	},
