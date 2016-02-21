@@ -182,10 +182,7 @@ module.exports = {
             if (err) {
                 console.log(err);
             }
-            _db.collection('voters').find({_id: result.insertedId})
-            .next(function(err, voter){
-                console.log("Voter: ", voter);
-            });
+            console.log("Voter Id: ", result.insertedId);
         });
     },
 
