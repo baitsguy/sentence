@@ -5,6 +5,8 @@ var client = mongo.MongoClient;
 var ObjectID = mongo.ObjectID;
 var _db;
 
+var scheduler = require('./scheduler');
+
 module.exports = {
 	connect: function() {
 		client.connect('mongodb://localhost:27017/sentence-dev', function(err, db) {
@@ -21,9 +23,9 @@ module.exports = {
 		return ObjectID(idStr);
 	},
 
-	setVoteCompletedAt: function(sentenceId) {
-		var query = { sentence_id: ObjectID(sentenceId), completedAt: {$exists: false}};
-        var update = {$set: {completedAt: new Date()}};
+	setVoteDone: function(sentenceId) {
+		var query = { sentence_id: ObjectID(sentenceId), voteDone: {$exists: false}};
+        var update = {$set: {voteDone: true}};
         console.log("Querying with: ", query);
         console.log("Then running update: ", update);
         _db.collection('votes').findOneAndUpdate(query, update, {});
@@ -37,21 +39,23 @@ module.exports = {
     },
 
     createNewVote: function(sentenceId, callback) {
-        _db.collection('votes').insertOne({ sentence_id: ObjectID(sentenceId), createdAt: new Date()}, function(err, result){
+    	var voteEndDate = scheduler.getNextVoteEnd();
+    	var data = { sentence_id: ObjectID(sentenceId), createdAt: new Date(), completedAt: voteEndDate};
+        _db.collection('votes').insertOne(data, function(err, result){
             if (err) {
                 console.log(err);
             }
             _db.collection('votes').find({_id: result.insertedId})
             .next(function(err, vote){
                 console.log("Result of insert: ", vote);
+                callback(sentenceId, vote);
             });
-            callback(sentenceId);
         });
     },
 
     createSentence: function(callback) {
         var _this = this;
-        _db.collection('sentences').insertOne({createdAt: new Date()}, function(err, result){
+        _db.collection('sentences').insertOne({createdAt: new Date(), text: ''}, function(err, result){
             if (err) {
                 console.log(err);
             }
@@ -118,7 +122,7 @@ module.exports = {
 
     getVote: function(sentenceId, callback) {
     	var _this = this;
-    	_db.collection('votes').find({ "sentence_id": ObjectID(sentenceId), completedAt: { $exists: false }})
+    	_db.collection('votes').find({ "sentence_id": ObjectID(sentenceId), voteDone: { $exists: false }})
         .next(function(err,vote){
             if (err) {
                 console.log(err);
@@ -137,7 +141,7 @@ module.exports = {
 
     submitWord: function(sentenceId, word, ip, callback) {
         var _this = this;
-        _db.collection('votes').find({ sentence_id: ObjectID(sentenceId), completedAt: {$exists: false}})
+        _db.collection('votes').find({ sentence_id: ObjectID(sentenceId), voteDone: {$exists: false}})
         .next(function(err, vote){
             _this.checkVoter(sentenceId, vote._id, word, ip, callback);
         });

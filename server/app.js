@@ -66,8 +66,8 @@ function emitGameObject(objTypeStr, object) {
     }
 }
 
-function resetTimer(sentenceId) {
-    job = scheduler.scheduleNextVoteEnd(sentenceId, voteEnd);
+function resetTimer(sentenceId, voteEndTime) {
+    job = scheduler.scheduleNextVoteEnd(sentenceId, voteEndTime, voteEnd);
 }
 
 function voteEnd(sentenceId){
@@ -76,7 +76,7 @@ function voteEnd(sentenceId){
     io.emit('vote end');
     var isEndOfGame = false;
     // Check votes and append highest vote to current sentence
-    mongoUtil.setVoteCompletedAt(sentenceId);
+    mongoUtil.setVoteDone(sentenceId);
     mongoUtil.voteEnd(sentenceId, isEndOfGame, nextRound);
 }
 
@@ -101,12 +101,12 @@ function sendDetailsForSentences(sentenceId) {
     mongoUtil.getSentenceDetails(sentenceId, emitGameObject);
 }
 
-function gameStart(sentenceId) {
-    resetTimer(sentenceId);
+function gameStart(sentenceId, vote) {
+    resetTimer(sentenceId, vote.completedAt);
     emitGameObject('new sentence', sentenceId);
 }
 
-function voteStart(sentenceId) {
-    resetTimer(sentenceId);
-    emitGameObject('vote start');
+function voteStart(sentenceId, vote) {
+    resetTimer(sentenceId, vote.completedAt);
+    emitGameObject('vote start', vote);
 }
