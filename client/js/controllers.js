@@ -22,9 +22,7 @@ app.controller('GameController', ['$scope', '$routeParams',
       console.log("Word: ", word);
       socket.emit('word submit', word, $routeParams.sentenceId);
       $("#form").hide();
-      $scope.$apply(function() {
-        $scope.success = true;
-      });
+      $scope.success = true;
     };
     socket.on('words', function(words) {
       $scope.$apply(function() {
