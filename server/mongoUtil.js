@@ -17,21 +17,6 @@ module.exports = {
 		});
 	},
 
-	sentencesCon: function() {
-		console.log("Retrieving sentences collection from _db");
-		return _db.collection('sentences');
-	},
-
-	votesCon: function() {
-		console.log("Retrieving votes collection from _db");
-		return _db.collection('votes');
-	},
-
-	wordsCon: function() {
-		console.log("Retrieving words collection from _db");
-		return _db.collection('words');
-	},
-
 	ObjectID: function(idStr) {
 		return ObjectID(idStr);
 	},
