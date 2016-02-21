@@ -74,7 +74,7 @@ module.exports = {
         .next(function(err, sentence){
             console.log("Sentence before append: ", sentence);
             var nextSentence = sentence.text + " " + word;
-            callback('update sentence', nextSentence);
+            callback(sentenceId, 'update sentence', nextSentence);
             var update = {$set: {text: nextSentence}};
             _db.collection('sentences').findOneAndUpdate(query,update, {});
         });
@@ -89,7 +89,7 @@ module.exports = {
                 console.log(err);
             }
             console.log("Doc is: ", doc.value.text);
-            callback('update sentence', doc.value.text);
+            callback(sentenceId, 'update sentence', doc.value.text);
         });
     },
 
@@ -101,7 +101,7 @@ module.exports = {
             }
             
             console.log(sentences);
-            callback('sentences', sentences);
+            callback(null, 'sentences', sentences);
         });
     },
 
@@ -111,18 +111,18 @@ module.exports = {
             if (err) {
                 console.log(err);
             }
-            callback('sentence', sentence);
+            callback(sentenceId, 'sentence', sentence);
         });
     },
 
-    getWords: function(voteId, callback) {
+    getWords: function(sentenceId, voteId, callback) {
         _db.collection('words').find({ vote_id: ObjectID(voteId)}).sort({numVotes: -1}).limit(10)
         .toArray(function(err, words){
             if (err) {
                 console.log(err);
             }
             console.log(words);
-            callback('words', words);
+            callback(sentenceId, 'words', words);
         });
     },
 
@@ -134,10 +134,10 @@ module.exports = {
                 console.log(err);
             }
             console.log(vote);
-            callback('vote', vote);
+            callback(sentenceId, 'vote', vote);
 
             if (vote) {
-            	_this.getWords(vote._id, callback);
+            	_this.getWords(sentenceId, vote._id, callback);
             }
         });
     },

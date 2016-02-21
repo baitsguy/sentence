@@ -34,6 +34,10 @@ app.get("/game/:sentenceId", function(request, response) {
 
 io.on('connection', function(socket){
 
+    socket.on('join sentence', function(sentenceId) {
+        socket.join(sentenceId);
+    });
+
     socket.on('get sentences', function() {
         mongoUtil.getSentences(true, emitGameObject);
     });
@@ -57,12 +61,13 @@ io.on('connection', function(socket){
     });
 });
 
-function emitGameObject(objTypeStr, object) {
+function emitGameObject(sentenceId, objTypeStr, object) {
+    var emitter = (sentenceId) ? io.to(sentenceId) : io;
     console.log(objTypeStr + ((object) ? " object: " : ""), object);
     if (object) {
-        io.emit(objTypeStr, object);
+        emitter.emit(objTypeStr, object);
     } else {
-        io.emit(objTypeStr);
+        emitter.emit(objTypeStr);
     }
 }
 
@@ -91,7 +96,7 @@ function nextRound(sentenceId, word, isGameEnd) {
     // Check if end of game
     if (isGameEnd) {
         mongoUtil.endGame(sentenceId, emitGameObject);
-        emitGameObject('game end');
+        emitGameObject(sentenceId, 'game end');
     } else {
         mongoUtil.createNewVote(sentenceId, voteStart);
     }
@@ -103,10 +108,10 @@ function sendDetailsForSentences(sentenceId) {
 
 function gameStart(sentenceId, vote) {
     resetTimer(sentenceId, vote.completedAt);
-    emitGameObject('new sentence', sentenceId);
+    emitGameObject(sentenceId, 'new sentence', sentenceId);
 }
 
 function voteStart(sentenceId, vote) {
     resetTimer(sentenceId, vote.completedAt);
-    emitGameObject('vote start', vote);
+    emitGameObject(sentenceId, 'vote start', vote);
 }

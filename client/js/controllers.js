@@ -30,6 +30,7 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
     $("#form").hide();
     $("#tags").hide();
     $scope.success = false;
+    socket.emit('join sentence', $routeParams.sentenceId);
     socket.emit('get game', $routeParams.sentenceId);
     $("#next-word-textbox").focus();
     $scope.submitWord = function(word) {
@@ -49,6 +50,7 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
       });
     };
     socket.on('words', function(words) {
+      console.log("Got words: ", words);
       if (words.length != 0) {
         //Set size based on votes
         var maxIndex = 0;
