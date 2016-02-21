@@ -19,9 +19,9 @@
     Your word has been submitted! Wait another 10 seconds to try and play the next word.
   </div>
 
- <div class="row" style="margin-top: 10%">
+ <div id="tags" class="row" style="margin-top: 10%">
   <span ng:repeat="(index, value) in words">
-      <span class="tag" style="font-size: {{value.size}}em"><a href="" ng-click="populateWord(value.word)">{{value.word}}</a></span>
+      <span class="tag" style="font-size: {{value.size}}em"><a href="" ng-click="submitWord(value.word)">{{value.word}}</a></span>
   </span>
  </div>
 </div>

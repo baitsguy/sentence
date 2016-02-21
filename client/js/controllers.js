@@ -22,10 +22,6 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
     $scope.success = false;
     socket.emit('get game', $routeParams.sentenceId);
     $("#next-word-textbox").focus();
-    $scope.populateWord = function(word) {
-      $scope.nextWordTextbox = word;
-      //$('#nextWordTextbox').val(word);
-    };
     $scope.submitWord = function(word) {
       var json = 'http://ipv4.myexternalip.com/json';
       var ip = "none";
@@ -35,6 +31,8 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
           console.log("Word: ", word);
           socket.emit('word submit', word, $routeParams.sentenceId, ip);
           $("#form").hide();
+          $("#tags").hide();
+          $scope.nextWordTextbox = word;
           $scope.success = true;
       }, function(e) {
           alert("Error in determining your session context." +
