@@ -98,15 +98,18 @@ io.on('connection', function(socket){
     });
 
     socket.on('word submit', function(word, sentenceId){
-        var query = {word: word}; // Need to add "game_id" to query once added
-        var update = {$inc: {numVotes: 1}};
-        mongoUtil.wordsCon().findOneAndUpdate(query, update, {upsert: true}, function(err, res){
-            if (err) {
-                console.log(err);
-            }
-            console.log("Word Update: ", res);
+        mongoUtil.votesCon().find({ sentence_id: mongoUtil.ObjectID(sentenceId), completedAt: {$exists: false}})
+        .next(function(err, vote){
+            var query = {word: word, vote_id: vote._id}; // Need to add "game_id" to query once added
+            var update = {$inc: {numVotes: 1}};
+            mongoUtil.wordsCon().findOneAndUpdate(query, update, {upsert: true}, function(err, res){
+                if (err) {
+                    console.log(err);
+                }
+                console.log("Word Update: ", res);
+            });
+            sendDetailsForSentences(sentenceId);
         });
-        sendDetailsForSentences(sentenceId);
     });
 
     function sendDetailsForSentences(sentenceId) {
@@ -119,7 +122,7 @@ io.on('connection', function(socket){
             io.emit('sentence', sentence);
         });
 
-        mongoUtil.votesCon().find({ "sentence_id": mongoUtil.ObjectID(sentenceId), completed_at: { $exists: false }})
+        mongoUtil.votesCon().find({ "sentence_id": mongoUtil.ObjectID(sentenceId), completedAt: { $exists: false }})
         .next(function(err,doc){
 
             if (err) {
