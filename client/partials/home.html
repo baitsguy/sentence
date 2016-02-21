@@ -4,7 +4,7 @@
     </div>
     
     <div class="row sentence-row" ng:repeat="(index, value) in sentenceTextList">
-      <a href="/game/{{value._id}}">
+      <a ng-href="/game/{{value._id}}">
         <div class="row">
           <h2>{{value.text}}</h2>
         <p>10 seconds left</p>

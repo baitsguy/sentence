@@ -44,9 +44,9 @@ io.on('connection', function(socket){
     });
     socket.on('getGame', function(sentenceId){
         console.log("starting game");
-        var sentencesCon = mongoUtil.sentences();
-        var votesCon = mongoUtil.votes();
-        var wordsCon = mongoUtil.words();
+        var sentencesCon = mongoUtil.sentencesCon();
+        var votesCon = mongoUtil.votesCon();
+        var wordsCon = mongoUtil.wordsCon();
 
         mongoUtil.sentencesCon().find({ "_id": mongoUtil.ObjectID(sentenceId) })
         .next(function(err, doc){
