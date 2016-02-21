@@ -106,7 +106,7 @@ module.exports = {
     },
 
     getWords: function(voteId, callback) {
-        _db.collection('words').find({ vote_id: ObjectID(voteId)})
+        _db.collection('words').find({ vote_id: ObjectID(voteId)}).sort({numVotes: -1}).limit(10)
         .toArray(function(err, words){
             if (err) {
                 console.log(err);
