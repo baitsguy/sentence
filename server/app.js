@@ -81,6 +81,7 @@ io.on('connection', function(socket){
     function voteEnd(sentenceId){
     	console.log("Voting Ended!");
         job.cancel();
+        io.emit('vote end');
         var isEndOfGame = false;
     	// Check votes and append highest vote to current sentence
         mongoUtil.setVoteCompletedAt(sentenceId);
@@ -106,6 +107,7 @@ io.on('connection', function(socket){
                 } else {
                     mongoUtil.createNewVote(sentenceId);
                     resetTimer(sentenceId);
+                    io.emit('vote start');
                 }
             });
         });
