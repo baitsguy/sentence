@@ -14,8 +14,7 @@ module.exports = {
 	    return nextVoteEnd;
 	},
 
-	scheduleNextVoteEnd: function(sentenceId, callback){
-		var nextVoteEnd = this.getNextVoteEnd();
+	scheduleNextVoteEnd: function(sentenceId, nextVoteEnd, callback){
 		return schedule.scheduleJob(nextVoteEnd, function(){
 			callback(sentenceId);
 		});
