@@ -46,9 +46,19 @@ io.on('connection', function(socket){
         });
     });
 
-    function emitSentenceText(sentence) {
-        console.log("New full sentence: ", sentence);
-        io.emit('update sentence', sentence);
+    function emitSentenceId(sentenceId) {
+        console.log("sentence created: ", sentenceId);
+        io.emit('new sentence', sentenceId);
+    }
+
+    function emitSentenceText(sentenceText) {
+        console.log("New full sentence: ", sentenceText);
+        io.emit('update sentence', sentenceText);
+    }
+
+    function emitGameObject(objTypeStr, object) {
+        console.log(objTypeStr + " object: ", sentence);
+        io.emit(objTypeStr, object);
     }
 
     function resetTimer(sentenceId) {
@@ -94,11 +104,6 @@ io.on('connection', function(socket){
         });
 	};
 
-    function emitSentenceId(sentenceId) {
-        console.log("sentence created: ", sentenceId);
-        io.emit('new sentence', sentenceId);
-    }
-
     socket.on('create game', function(){
         console.log("creating a game");
         mongoUtil.createSentence(emitSentenceId);
@@ -134,35 +139,6 @@ io.on('connection', function(socket){
     });
 
     function sendDetailsForSentences(sentenceId) {
-        mongoUtil.sentencesCon().find({ "_id": mongoUtil.ObjectID(sentenceId) })
-        .next(function(err, doc){
-            if (err) {
-                console.log(err);
-            }
-            sentence = doc;
-            io.emit('sentence', sentence);
-        });
-
-        mongoUtil.votesCon().find({ "sentence_id": mongoUtil.ObjectID(sentenceId), completedAt: { $exists: false }})
-        .next(function(err,doc){
-
-            if (err) {
-                console.log(err);
-            }
-            console.log(doc);
-            vote = doc;
-            io.emit('vote', vote);
-
-            var words = [];
-            mongoUtil.wordsCon().find({ vote_id: mongoUtil.ObjectID(vote._id)})
-            .toArray(function(err, docs){
-                if (err) {
-                    console.log(err);
-                }
-                console.log(docs);
-                words = docs;
-                io.emit('words', words);
-            });
-        });
+        mongoUtil.getSentenceDetails(sentenceId, emitGameObject);
     }
 });

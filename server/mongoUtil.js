@@ -95,5 +95,45 @@ module.exports = {
             console.log("Doc is: ", doc.value.text);
             callback(doc.value.text);
         });
+    },
+
+    getSentence: function(sentenceId, callback) {
+    	_db.collection('sentences').find({ "_id": ObjectID(sentenceId) })
+        .next(function(err, sentence){
+            if (err) {
+                console.log(err);
+            }
+            callback('sentence', sentence);
+        });
+    },
+
+    getWords: function(voteId, callback) {
+        _db.collection('words').find({ vote_id: ObjectID(voteId)})
+        .toArray(function(err, words){
+            if (err) {
+                console.log(err);
+            }
+            console.log(words);
+            callback('words', words);
+        });
+    },
+
+    getVote: function(sentenceId, callback) {
+    	var _this = this;
+    	_db.collection('votes').find({ "sentence_id": ObjectID(sentenceId), completedAt: { $exists: false }})
+        .next(function(err,vote){
+            if (err) {
+                console.log(err);
+            }
+            console.log(vote);
+            callback('vote', vote);
+
+            _this.getWords(vote._id, callback);
+        });
+    },
+
+    getSentenceDetails: function(sentenceId, callback) {
+    	this.getSentence(sentenceId, callback);
+        this.getVote(sentenceId, callback);
     }
 };
