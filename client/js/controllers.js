@@ -19,6 +19,8 @@ app.controller('HomeController', ['$scope', '$routeParams', '$window',
 app.controller('GameController', ['$scope', '$http', '$routeParams',
   function($scope, $http, $routeParams) {
     console.log("called game controller");
+    $("#form").hide();
+    $("#tags").hide();
     $scope.success = false;
     socket.emit('get game', $routeParams.sentenceId);
     $("#next-word-textbox").focus();
@@ -30,8 +32,6 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
           console.log("ip is", ip);
           console.log("Word: ", word);
           socket.emit('word submit', word, $routeParams.sentenceId, ip);
-          $("#form").hide();
-          $("#tags").hide();
           $scope.nextWordTextbox = word;
           $scope.success = true;
       }, function(e) {
@@ -59,7 +59,30 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
         $scope.words = shuffle(words);
       });
     });
+    socket.on('vote start', function() {
+      //Reopen everything
+      $scope.$apply(function() {
+        $scope.words = [];
+        $("#form").show();
+        $("#tags").show();
+        $scope.success = false;
+      });
+    });
+    socket.on('vote start', function() {
+      //Reopen everything
+      $scope.$apply(function() {
+        $scope.words = [];
+        $("#form").show();
+        $("#tags").show();
+        $scope.success = false;
+      });
+    });
     socket.on('sentence', function(sentence) {
+      $scope.$apply(function() {
+        $scope.sentence = sentence.text + " ";
+      });
+    });
+    socket.on('update sentence', function(sentence) {
       $scope.$apply(function() {
         $scope.sentence = sentence.text + " ";
       });
@@ -68,6 +91,8 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
       console.log("Got votes: ", vote);
       $scope.$apply(function() {
         $scope.vote = vote.text + " ";
+        $("#form").show();
+        $("#tags").show();
       });
     });
 }]);
