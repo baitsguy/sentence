@@ -46,29 +46,9 @@ io.on('connection', function(socket){
         });
     });
 
-    function endGame(sentenceId) {
-        console.log("Ending game");
-        var query = { _id: mongoUtil.ObjectID(sentenceId) };
-        var update = {$set: {completedAt: new Date()}};
-        mongoUtil.sentencesCon().findAndModify(query, [], update, {}, function(err, doc){
-            if (err) {
-                console.log(err);
-            }
-            console.log("Doc is: ", doc.value.text);
-            io.emit('game end', doc.value.text);
-        });
-    }
-
-    function appendWinningWordToSentence(word, sentenceId) {
-        var query = {_id: mongoUtil.ObjectID(sentenceId)};
-        mongoUtil.sentencesCon().find(query).limit(1)
-        .next(function(err, sentence){
-            console.log("Sentence before append: ", sentence);
-            var nextSent = sentence.text + " " + word;
-            io.emit('update sentance', nextSent);
-            var update = {$set: {text: nextSent}};
-            mongoUtil.sentencesCon().findOneAndUpdate(query,update, {});
-        });
+    function emitSentenceText(sentence) {
+        console.log("New full sentence: ", sentence);
+        io.emit('update sentence', sentence);
     }
 
     function resetTimer(sentenceId) {
@@ -98,12 +78,13 @@ io.on('connection', function(socket){
                     isEndOfGame = true;
                 } else {
                     mongoUtil.setWinningWordForVote(word._id, sentenceId);
-                    appendWinningWordToSentence(word.word, sentenceId);
+                    mongoUtil.appendWinningWordToSentence(word.word, sentenceId, emitSentenceText);
                 }
 
                 // Check if end of game
                 if (isEndOfGame) {
-                    endGame(sentenceId);
+                    mongoUtil.endGame(sentenceId, emitSentenceText);
+                    io.emit('game end');
                 } else {
                     mongoUtil.createNewVote(sentenceId);
                     resetTimer(sentenceId);
@@ -113,6 +94,15 @@ io.on('connection', function(socket){
         });
 	};
 
+    function emitSentenceId(sentenceId) {
+        console.log("sentence created: ", sentenceId);
+        io.emit('new sentence', sentenceId);
+    }
+
+    socket.on('create game', function(){
+        console.log("creating a game");
+        mongoUtil.createSentence(emitSentenceId);
+    });
 
     socket.on('getGame', function(sentenceId){
         console.log("starting game");

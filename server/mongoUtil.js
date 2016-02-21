@@ -61,5 +61,39 @@ module.exports = {
                 console.log("Result of insert: ", vote);
             });
         });
+    },
+
+    createSentence: function(callback) {
+        _db.collection('sentences').insertOne({createdAt: new Date()}, function(err, result){
+            if (err) {
+                console.log(err);
+            }
+            callback(result.insertedId);
+        });
+    },
+
+    appendWinningWordToSentence: function(word, sentenceId, callback) {
+        var query = {_id: ObjectID(sentenceId)};
+        _db.collection('sentences').find(query).limit(1)
+        .next(function(err, sentence){
+            console.log("Sentence before append: ", sentence);
+            var nextSentence = sentence.text + " " + word;
+            callback(nextSentence);
+            var update = {$set: {text: nextSentence}};
+            _db.collection('sentences').findOneAndUpdate(query,update, {});
+        });
+    },
+
+    endGame: function(sentenceId, callback) {
+        console.log("Ending game");
+        var query = { _id: ObjectID(sentenceId) };
+        var update = {$set: {completedAt: new Date()}};
+        _db.collection('sentences').findAndModify(query, [], update, {}, function(err, doc){
+            if (err) {
+                console.log(err);
+            }
+            console.log("Doc is: ", doc.value.text);
+            callback(doc.value.text);
+        });
     }
 };
