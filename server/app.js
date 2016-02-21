@@ -34,7 +34,7 @@ app.get("/game/:sentenceId", function(request, response) {
 
 io.on('connection', function(socket){
     socket.on('getSentences', function() {
-        mongoUtil.getSentences(emitGameObject);
+        mongoUtil.getSentences(true, emitGameObject);
     });
 
     socket.on('create game', function(){

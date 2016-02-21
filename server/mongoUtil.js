@@ -49,11 +49,13 @@ module.exports = {
     },
 
     createSentence: function(callback) {
+        var _this = this;
         _db.collection('sentences').insertOne({createdAt: new Date()}, function(err, result){
             if (err) {
                 console.log(err);
             }
             callback('new sentence', result.insertedId);
+            _this.createNewVote(result.insertedId);
         });
     },
 
@@ -82,8 +84,9 @@ module.exports = {
         });
     },
 
-    getSentences: function(callback) {
-        _db.collection('sentences').find().limit( 10 ).toArray(function(err, sentences){
+    getSentences: function(onlyActive, callback) {
+        var query = (onlyActive) ? { completedAt: { $exists: false } }  : { completedAt: { $exists: true } };
+        _db.collection('sentences').find(query).limit( 10 ).toArray(function(err, sentences){
             if (err) {
                 console.log(err);
             }
