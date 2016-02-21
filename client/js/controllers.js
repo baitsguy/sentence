@@ -15,12 +15,16 @@ app.controller('HomeController', ['$scope', '$routeParams',
 app.controller('GameController', ['$scope', '$routeParams',
   function($scope, $routeParams) {
     console.log("called game controller");
+    $scope.success = false;
     socket.emit('getGame', $routeParams.sentenceId);
     $("#next-word-textbox").focus();
     $scope.submitWord = function(word) {
       console.log("Word: ", word);
-      socket.emit('word submit', word);
-      $scope.nextWordTextbox = '';
+      socket.emit('word submit', word, $routeParams.sentenceId);
+      $("#form").hide();
+      $scope.$apply(function() {
+        $scope.success = true;
+      });
     };
     socket.on('words', function(words) {
       $scope.$apply(function() {
@@ -33,13 +37,6 @@ app.controller('GameController', ['$scope', '$routeParams',
       });
     });
 }]);
-
-function submitWord() {
-  $("#next-word-textbox").hide();
-  $("#user-message").text("Your word has been submitted! Wait another 10 seconds to try and play the next word.");
-  $("#user-message").removeClass("pink");
-  $("#user-message").addClass("green");
-}
 
 // $("#next-word").animate({backgroundColor: '#b3ffda'}, {
 //         duration: 2000,

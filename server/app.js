@@ -86,6 +86,61 @@ io.on('connection', function(socket){
     socket.on('getGame', function(sentenceId){
         console.log("starting game");
 
+        var voteEndDate = scheduler.getNextVoteEnd();
+        var job = scheduler.scheduleJob(voteEndDate, function(){
+        	voteEnd(sentenceId);
+        });
+        sendDetailsForSentences(sentenceId);
+    });
+
+    socket.on('disconnect', function(){
+        console.log('user disconnected');
+    });
+
+    socket.on('word submit', function(word, sentenceId){
+        var query = {word: word}; // Need to add "game_id" to query once added
+        var update = {$inc: {numVotes: 1}};
+        mongoUtil.wordsCon().findOneAndUpdate(query, update, {upsert: true}, function(err, res){
+            if (err) {
+                console.log(err);
+            }
+            console.log("Word Update: ", res);
+        });
+        sendDetailsForSentences(sentenceId);
+    });
+
+    socket.on('vote end', function(sentenceId){
+    	// Check votes and append highest vote to current sentence
+    	// and set vote.winningWord, completedAt
+
+    	// Check if end of game
+    	var isEndOfGame = false;
+    	if (isEndOfGame) {
+	    	//	If end -> set sentence.completedAt, emit game end with final sentence
+	    	var query = { _id: mongoUtil.ObjectID(sentenceId) };
+	    	var update = {$set: {completedAt: new Date()}};
+	    	var text = mongoUtil.sentencesCon().findAndModify(query, [], update, {}, function(err, doc){
+	    		if (err) {
+	    			console.log(err);
+	    		}
+	    		console.log("Doc is: ", doc.value.text);
+	    		io.emit('game end', doc.value.text);
+	    	});
+	    } else {
+	    	// Else -> create new vote, reset timer
+	    	mongoUtil.votesCon().insertOne({ sentence_id: mongoUtil.ObjectID(sentenceId), createdAt: new Date()}, function(err, result){
+	    		if (err) {
+	    			console.log(err);
+	    		}
+	    		mongoUtil.votesCon().find({_id: result.insertedId})
+	    		.next(function(err, vote){
+	    			console.log("Result of insert: ", vote);
+	    		});
+	    	});
+	    }
+    });
+
+    function sendDetailsForSentences(sentenceId) {
         mongoUtil.sentencesCon().find({ "_id": mongoUtil.ObjectID(sentenceId) })
         .next(function(err, doc){
             if (err) {
@@ -116,26 +171,5 @@ io.on('connection', function(socket){
                 io.emit('words', words);
             });
         });
-
-        var voteEndDate = scheduler.getNextVoteEnd();
-        var job = scheduler.scheduleJob(voteEndDate, function(){
-        	voteEnd(sentenceId);
-        });
-    });
-
-    socket.on('disconnect', function(){
-        console.log('user disconnected');
-    });
-
-    socket.on('word submit', function(word){
-        var query = {word: word}; // Need to add "sentence_id" to query once added
-        var update = {$inc: {numVotes: 1}};
-        mongoUtil.wordsCon().findOneAndUpdate(query, update, {upsert: true}, function(err, res){
-            if (err) {
-                console.log(err);
-            }
-            console.log("Word Update: ", res);
-        });
-        console.log('Word: ' + word);
-    });
+    }
 });
