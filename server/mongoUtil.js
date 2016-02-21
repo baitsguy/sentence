@@ -39,17 +39,22 @@ module.exports = {
     },
 
     createNewVote: function(sentenceId, callback) {
+        var _this = this;
     	var voteEndDate = scheduler.getNextVoteEnd();
     	var data = { sentence_id: ObjectID(sentenceId), createdAt: new Date(), completedAt: voteEndDate};
         _db.collection('votes').insertOne(data, function(err, result){
             if (err) {
                 console.log(err);
             }
-            _db.collection('votes').find({_id: result.insertedId})
-            .next(function(err, vote){
-                console.log("Result of insert: ", vote);
-                callback(sentenceId, vote);
-            });
+            _this.findInsertedVote(sentenceId, result.insertedId, callback);
+        });
+    },
+
+    findInsertedVote: function(sentenceId, voteId, callback) {
+        _db.collection('votes').find({_id: voteId})
+        .next(function(err, vote){
+            console.log("Result of insert: ", vote);
+            callback(sentenceId, vote);
         });
     },
 
