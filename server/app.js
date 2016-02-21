@@ -6,6 +6,7 @@ var io = require('socket.io')(http);
 var sentence;
 var vote;
 var sentenceId;
+var job;
 
 var mongoUtil = require('./mongoUtil');
 mongoUtil.connect();
@@ -45,70 +46,87 @@ io.on('connection', function(socket){
         });
     });
 
+    function endGame(sentenceId) {
+        console.log("Ending game");
+        var query = { _id: mongoUtil.ObjectID(sentenceId) };
+        var update = {$set: {completedAt: new Date()}};
+        var text = mongoUtil.sentencesCon().findAndModify(query, [], update, {}, function(err, doc){
+            if (err) {
+                console.log(err);
+            }
+            console.log("Doc is: ", doc.value.text);
+            io.emit('game end', doc.value.text);
+        });
+    }
+
     function voteEnd(sentenceId){
     	console.log("Voting Ended!");
+        job.cancel();
+        var isEndOfGame = false;
     	// Check votes and append highest vote to current sentence
     	// and set vote.winningWord, completedAt
         var query = { sentence_id: mongoUtil.ObjectID(sentenceId), completedAt: {$exists: false}};
         var update = {$set: {completedAt: new Date()}};
+        console.log("Querying with: ", query);
+        console.log("Then running update: ", update);
         mongoUtil.votesCon().findOneAndUpdate(query, update, {});
         query = { sentence_id: mongoUtil.ObjectID(sentenceId) }
+        console.log("Querying with: ", query);
         mongoUtil.votesCon().find(query).sort({completedAt: -1}).limit(1)
         .next(function(err, vote){
             console.log("Querying with vote_id: ", vote._id);
-            query = {vote_id: vote._id};
+            query = {vote_id: mongoUtil.ObjectID(vote._id)};
             mongoUtil.wordsCon().find(query).sort({numVotes: -1}).limit(1)
             .next(function(err, word){
                 console.log("Returned word: ", word);
                 if (err) {
                     console.log(err);
                 }
-                query = {sentence_id: mongoUtil.ObjectID(sentenceId)};
-                update = {$set: {winningWord: word._id}};
-                mongoUtil.votesCon().findOneAndUpdate(query, update, {});
 
-                query = {_id: mongoUtil.ObjectID(sentenceId)};
-                mongoUtil.sentencesCon().find(query).limit(1)
-                .next(function(err, sentence){
-                    console.log("Query for sentence: ", sentence);
-                    var nextSent = sentence.text + word.word;
-                    io.emit('update sentance', nextSent);
-                    update = {$set: {text: nextSent}};
-                    mongoUtil.sentencesCon().findOneAndUpdate(query,update, {});
-                });
+                if (!word) {
+                    isEndOfGame = true;
+                } else {
+                    query = {sentence_id: mongoUtil.ObjectID(sentenceId)};
+                    update = {$set: {winningWord: mongoUtil.ObjectID(word._id)}};
+                    console.log("Querying with: ", query);
+                    console.log("Then running update: ", update);
+                    mongoUtil.votesCon().findOneAndUpdate(query, update, {});
+
+                    query = {_id: mongoUtil.ObjectID(sentenceId)};
+                    console.log("Querying with: ", query);
+                    mongoUtil.sentencesCon().find(query).limit(1)
+                    .next(function(err, sentence){
+                        console.log("Query for sentence: ", sentence);
+                        var nextSent = sentence.text + " " + word.word;
+                        io.emit('update sentance', nextSent);
+                        update = {$set: {text: nextSent}};
+                        mongoUtil.sentencesCon().findOneAndUpdate(query,update, {});
+                    });
+                }
+
+                // Check if end of game
+                if (isEndOfGame) {
+                    //  If end -> set sentence.completedAt, emit game end with final sentence
+                    endGame(sentenceId);
+                } else {
+                    // Else -> create new vote, reset timer
+                    mongoUtil.votesCon().insertOne({ sentence_id: mongoUtil.ObjectID(sentenceId), createdAt: new Date()}, function(err, result){
+                        if (err) {
+                            console.log(err);
+                        }
+                        mongoUtil.votesCon().find({_id: result.insertedId})
+                        .next(function(err, vote){
+                            console.log("Result of insert: ", vote);
+                        });
+                    });
+
+                    var voteEndDate = scheduler.getNextVoteEnd();
+                    job = scheduler.scheduleJob(voteEndDate, function(){
+                        voteEnd(sentenceId);
+                    });
+                }
             });
         });
-
-    	// Check if end of game
-    	var isEndOfGame = false;
-    	if (isEndOfGame) {
-	    	//	If end -> set sentence.completedAt, emit game end with final sentence
-	    	var query = { _id: mongoUtil.ObjectID(sentenceId) };
-	    	var update = {$set: {completedAt: new Date()}};
-	    	var text = mongoUtil.sentencesCon().findAndModify(query, [], update, {}, function(err, doc){
-	    		if (err) {
-	    			console.log(err);
-	    		}
-	    		console.log("Doc is: ", doc.value.text);
-	    		io.emit('game end', doc.value.text);
-	    	});
-	    } else {
-	    	// Else -> create new vote, reset timer
-	    	mongoUtil.votesCon().insertOne({ sentence_id: mongoUtil.ObjectID(sentenceId), createdAt: new Date()}, function(err, result){
-	    		if (err) {
-	    			console.log(err);
-	    		}
-	    		mongoUtil.votesCon().find({_id: result.insertedId})
-	    		.next(function(err, vote){
-	    			console.log("Result of insert: ", vote);
-	    		});
-	    	});
-
-	        var voteEndDate = scheduler.getNextVoteEnd();
-	        var job = scheduler.scheduleJob(voteEndDate, function(){
-	        	voteEnd(sentenceId);
-	        });
-	    }
 	};
 
 
@@ -116,7 +134,7 @@ io.on('connection', function(socket){
         console.log("starting game");
 
         var voteEndDate = scheduler.getNextVoteEnd();
-        var job = scheduler.scheduleJob(voteEndDate, function(){
+        job = scheduler.scheduleJob(voteEndDate, function(){
         	voteEnd(sentenceId);
         });
         sendDetailsForSentences(sentenceId);
