@@ -33,7 +33,8 @@ app.get("/game/:sentenceId", function(request, response) {
 });
 
 io.on('connection', function(socket){
-    socket.on('getSentences', function() {
+
+    socket.on('get sentences', function() {
         mongoUtil.getSentences(true, emitGameObject);
     });
 
@@ -42,7 +43,7 @@ io.on('connection', function(socket){
         mongoUtil.createSentence(gameStart);
     });
 
-    socket.on('getGame', function(sentenceId){
+    socket.on('get game', function(sentenceId){
         console.log("starting game");
         sendDetailsForSentences(sentenceId);
     });
@@ -51,7 +52,7 @@ io.on('connection', function(socket){
         console.log('user disconnected');
     });
 
-    socket.on('word submit', function(word, sentenceId){
+    socket.on('word submit', function(word, sentenceId, ip){
         mongoUtil.submitWord(sentenceId, word, sendDetailsForSentences);
     });
 });
