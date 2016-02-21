@@ -68,7 +68,7 @@ module.exports = {
             if (err) {
                 console.log(err);
             }
-            callback(result.insertedId);
+            callback('new sentence', result.insertedId);
         });
     },
 
@@ -78,7 +78,7 @@ module.exports = {
         .next(function(err, sentence){
             console.log("Sentence before append: ", sentence);
             var nextSentence = sentence.text + " " + word;
-            callback(nextSentence);
+            callback('update sentence', nextSentence);
             var update = {$set: {text: nextSentence}};
             _db.collection('sentences').findOneAndUpdate(query,update, {});
         });
@@ -93,7 +93,17 @@ module.exports = {
                 console.log(err);
             }
             console.log("Doc is: ", doc.value.text);
-            callback(doc.value.text);
+            callback('update sentence', doc.value.text);
+        });
+    },
+
+    getSentences: function(callback) {
+        _db.collection('sentences').find().limit( 10 ).toArray(function(err, sentences){
+            if (err) {
+                console.log(err);
+            }
+            console.log(sentences);
+            callback('sentences', sentences);
         });
     },
 
@@ -135,5 +145,51 @@ module.exports = {
     getSentenceDetails: function(sentenceId, callback) {
     	this.getSentence(sentenceId, callback);
         this.getVote(sentenceId, callback);
+    },
+
+    submitWord: function(sentenceId, word, callback) {
+        _db.collection('votes').find({ sentence_id: ObjectID(sentenceId), completedAt: {$exists: false}})
+        .next(function(err, vote){
+            var query = {word: word, vote_id: vote._id}; // Need to add "game_id" to query once added
+            var update = {$inc: {numVotes: 1}};
+            _db.collection('words').findOneAndUpdate(query, update, {upsert: true}, function(err, res){
+                if (err) {
+                    console.log(err);
+                }
+                console.log("Word Update: ", res);
+            });
+            callback(sentenceId);
+        });
+    },
+
+    voteEnd: function(sentenceId, isGameEnd, timerCallback, emitCallback) {
+    	var _this = this;
+	    _db.collection('votes').find({ sentence_id: ObjectID(sentenceId) }).sort({completedAt: -1}).limit(1)
+	    .next(function(err, vote){
+	        _db.collection('words').find({vote_id: ObjectID(vote._id)}).sort({numVotes: -1}).limit(1)
+	        .next(function(err, word){
+	            console.log("Returned word: ", word);
+	            if (err) {
+	                console.log(err);
+	            }
+
+	            if (!word) {
+	                isGameEnd = true;
+	            } else {
+	                _this.setWinningWordForVote(word._id, sentenceId);
+	                _this.appendWinningWordToSentence(word.word, sentenceId, emitCallback);
+	            }
+
+	            // Check if end of game
+	            if (isGameEnd) {
+	                _this.endGame(sentenceId, emitCallback);
+	                emitCallback('game end');
+	            } else {
+	                _this.createNewVote(sentenceId);
+	                timerCallback(sentenceId);
+	                emitCallback('vote start');
+	            }
+	        });
+	    });
     }
 };
