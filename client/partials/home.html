@@ -1,12 +1,12 @@
 <div ng-controller="HomeController" class="container">
-    <div class="row" style="margin-top: 5%">
-        <h1>{{title}}</h1>
-    </div>
-    
-    <div class="row">
+    <div class="row" style="margin-top: 5%; text-align:right;">
+        <h4>SENTENCIFY</h4>
       <form class="form" name="newSentenceForm" ng-submit="createGame()">
         <input class="btn" type="submit" value="Create Sentence" />
       </form>
+    </div>
+    
+    <div class="row">
     </div>
 
     <div class="row sentence-row" ng:repeat="(index, value) in sentenceTextList">

@@ -39,6 +39,20 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
       });
     };
     socket.on('words', function(words) {
+      if (words.length != 0) {
+        //Set size based on votes
+        var maxIndex = 0;
+        var fontSize = 5;
+        for(var i=0; i<words.length; i++) {
+          if(words[i].numVotes > words[maxIndex].numVotes) {
+            maxIndex = i;
+          }
+        }
+        var ratio = words[maxIndex].numVotes;
+        for(var i=0; i<words.length; i++) {
+          words[i].size = parseInt(words[i].numVotes * fontSize/ratio);
+        }
+      }
       $scope.$apply(function() {
         $scope.words = words;
       });
