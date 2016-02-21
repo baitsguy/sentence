@@ -136,7 +136,9 @@ module.exports = {
             console.log(vote);
             callback('vote', vote);
 
-            _this.getWords(vote._id, callback);
+            if (vote) {
+            	_this.getWords(vote._id, callback);
+            }
         });
     },
 
