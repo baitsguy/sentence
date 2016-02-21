@@ -135,18 +135,53 @@ module.exports = {
         this.getVote(sentenceId, callback);
     },
 
-    submitWord: function(sentenceId, word, callback) {
+    submitWord: function(sentenceId, word, ip, callback) {
+        var _this = this;
         _db.collection('votes').find({ sentence_id: ObjectID(sentenceId), completedAt: {$exists: false}})
         .next(function(err, vote){
-            var query = {word: word, vote_id: vote._id}; // Need to add "game_id" to query once added
-            var update = {$inc: {numVotes: 1}};
-            _db.collection('words').findOneAndUpdate(query, update, {upsert: true}, function(err, res){
-                if (err) {
-                    console.log(err);
-                }
-                console.log("Word Update: ", res);
-            });
+            _this.checkVoter(sentenceId, vote._id, word, ip, callback);
+        });
+    },
+
+    checkVoter: function(sentenceId, voteId, word, ip, callback) {
+        var _this = this;
+        var query = {vote_id: voteId, ip: ip};
+        _db.collection('voters').find(query).next(function(err, voter) {
+            if (err) {
+                console.log(err);
+            }
+           console.log('voter: ', voter);
+            if(voter) {
+                callback(sentenceId);
+            } else {
+                _this.insertWord(sentenceId, voteId, word, callback);
+            }
+        });
+    },
+
+    insertWord: function(sentenceId, voteId, word, ip, callback) {
+        var _this = this;
+        var query = {word: word, vote_id: voteId}; // Need to add "game_id" to query once added
+        var update = {$inc: {numVotes: 1}};
+        _db.collection('words').findOneAndUpdate(query, update, {upsert: true}, function(err, res){
+            if (err) {
+                console.log(err);
+            }
+            console.log("Word Update: ", res);
+            _this.insertVoter(voteId, ip);
             callback(sentenceId);
+        });
+    },
+
+    insertVoter: function(voteId, ip) {
+        _db.collection('voters').insertOne({ vote_id: ObjectID(voteId), ip: ip}, function(err, result){
+            if (err) {
+                console.log(err);
+            }
+            _db.collection('voters').find({_id: result.insertedId})
+            .next(function(err, voter){
+                console.log("Voter: ", voter);
+            });
         });
     },
 

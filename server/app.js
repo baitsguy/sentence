@@ -53,7 +53,7 @@ io.on('connection', function(socket){
     });
 
     socket.on('word submit', function(word, sentenceId, ip){
-        mongoUtil.submitWord(sentenceId, word, sendDetailsForSentences);
+        mongoUtil.submitWord(sentenceId, word, ip, sendDetailsForSentences);
     });
 });
 
