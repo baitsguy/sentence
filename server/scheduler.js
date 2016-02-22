@@ -7,9 +7,10 @@ function formatDate(date) {
 
 module.exports = {
 
-	getNextVoteEnd: function() {
+	getNextVoteEnd: function(voteLength) {
 		var dateNow = new Date();
-	    var nextVoteEnd = new Date(dateNow.getTime() + (30000));
+		var offset = (voteLength) ? voteLength * 1000 : 30000;
+	    var nextVoteEnd = new Date(dateNow.getTime() + (offset));
 	    console.log("Scheduling next vote end for: ", formatDate(nextVoteEnd));
 	    return nextVoteEnd;
 	},
