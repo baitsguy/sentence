@@ -117,7 +117,7 @@ module.exports = {
 			        	}
 			        	console.log("COUNT: ", count);
 			        	console.log("VOTE: ", vote);
-			        	var tempSentence = {sentence: sentence, voteEndTime: vote.completedAt};
+			        	var tempSentence = {sentence: sentence, voteEndTime: ((vote && onlyActive) ? vote.completedAt : null)};
 			        	sentenceArr.push(tempSentence);
 			        	count--;
 			        	if (count <= 0) {
