@@ -109,20 +109,16 @@ module.exports = {
         _db.collection('sentences').find(query).limit( 10 ).toArray(function(err, sentences){
         	var count = sentences.length;
         	sentences.forEach(function(sentence){
-					console.log("SENTENCE: ", sentence);
 			        _db.collection('votes').find({sentence_id: ObjectID(sentence._id), voteDone: {$exists: false}})
 			        .next(function(err, vote){
 			        	if (err) {
 			        		console.log(err);
 			        	}
-			        	console.log("COUNT: ", count);
-			        	console.log("VOTE: ", vote);
 			        	var tempSentence = {sentence: sentence, voteEndTime: ((vote && onlyActive) ? vote.completedAt : null)};
 			        	sentenceArr.push(tempSentence);
 			        	count--;
 			        	if (count <= 0) {
 			        		callback(null, 'sentences', sentenceArr);
-			        		console.log(sentenceArr);
 			        	}
 			        });
         	});

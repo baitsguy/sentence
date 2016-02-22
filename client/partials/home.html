@@ -8,11 +8,11 @@
     <div class="row sentence-list" style="margin-top:10%; margin-bottom:0px;">
       <a href="" class="subtle"ng-click="flipList()">{{listActiveSentences? 'Show inactive games': 'Show active games'}}</a>
 
-      <div class="sentence-row" ng:repeat="(index, value) in sentenceTextList">
-        <a ng-href="/game/{{value._id}}">
+      <div class="sentence-row" ng:repeat="(index, value) in sentenceDetailsList">
+        <a ng-href="/game/{{value.sentence._id}}">
           <div class="row">
-            <h2>{{value.text}}</h2>
-          <p>10 seconds left</p>
+            <h2>{{value.sentence.text?value.sentence.text:'[first word being picked]'}}</h2>
+          <p ng-show="{{value.secondsLeft > 0}}">Next word is picked in {{value.secondsLeft}} seconds</p>
           </div>
         </a>
       
