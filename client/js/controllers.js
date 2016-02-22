@@ -1,5 +1,12 @@
 var app = angular.module('sentencifyControllers', ['ngRoute']);
 
+app.controller('AboutController', ['$scope', '$http','$window',
+  function($scope, $http, $window) {
+    $scope.playGame = function() {
+      $window.location.href = '/sentences';
+    };
+  }]);
+
 app.controller('HomeController', ['$scope', '$http', '$routeParams', '$window',
   function($scope, $http, $routeParams, $window) {
     var socket = io();
@@ -103,6 +110,7 @@ app.controller('GameController', ['$scope', '$timeout', '$http', '$routeParams',
         $scope.words = [];
         $scope.wordSubmitted = false;
         $scope.voteEndTime = vote.completedAt;
+        $scope.nextWordTextbox = "";
       });
     });
     socket.on('sentence', function(sentence) {
@@ -115,6 +123,11 @@ app.controller('GameController', ['$scope', '$timeout', '$http', '$routeParams',
     socket.on('update sentence', function(sentence) {
       $scope.$apply(function() {
         $scope.sentence = sentence.text + " ";
+      });
+    });
+    socket.on('game end', function(sentence) {
+      $scope.$apply(function() {
+        $scope.gameEnded = true;
       });
     });
     socket.on('vote', function(vote) {

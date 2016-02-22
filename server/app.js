@@ -23,7 +23,7 @@ app.get('/', function(req, res) {
 });
 
 
-app.get('/home', function(req, res) {
+app.get('/sentences', function(req, res) {
     res.sendfile('./client/index.html'); // load the single view file (angular will handle the page changes on the front-end)
 });
 

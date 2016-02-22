@@ -6,11 +6,11 @@ sentencifyApp.config(['$routeProvider', '$locationProvider',
   function($routeProvider, $locationProvider) {
     $routeProvider.
       when('/', {
-        templateUrl: '/partials/home.html',
-        controller: 'HomeController'
+        templateUrl: '/partials/about.html',
+        controller: 'AboutController'
       }).
-      when('/home', {
-        templateUrl: '/partials/home.html',
+      when('/sentences', {
+        templateUrl: '/partials/sentences.html',
         controller: 'HomeController'
       }).
       when('/game/:sentenceId', {

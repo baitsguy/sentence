@@ -9,7 +9,7 @@
   <div id="form" class="row" style="margin-top: 10%" ng-show="!wordSubmitted && !gameEnded">
       <form name="wordForm" ng-submit="wordForm.$valid && submitWord(nextWordTextbox)">
         <input class="u-full-width" name="nextWordTextbox" type="text" placeholder="Enter a word" ng-model="nextWordTextbox" required ng-pattern="/()(^\s*\S+\s*$)/" id="nextWordTextbox">
-        <div class="row message" ng-class="{'pink':!wordForm.nextWordTextbox.$valid}" ng-show="!wordForm.nextWordTextbox.$valid && !wordForm.nextWordTextbox.$pristine">
+        <div class="row message" ng-class="{'pink':!wordForm.nextWordTextbox.$valid}" ng-show="!wordForm.nextWordTextbox.$valid && nextWordTextbox">
           Words can only contain letters and numbers. No whitespace or special characters.
         </div>
       </form>
