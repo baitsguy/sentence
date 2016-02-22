@@ -6,9 +6,14 @@ app.controller('HomeController', ['$scope', '$http', '$routeParams', '$window',
     console.log("called home controller");
     socket.emit('get sentences');
     $scope.listActiveSentences = true;
-    socket.on('sentences', function(sentences) {
+    socket.on('sentences', function(sentenceDetails) {
+      console.log("sentence details are ", sentenceDetails);
       $scope.$apply(function() {
-        $scope.sentenceTextList = sentences;
+        for(var i=0; i < sentenceDetails.length; i++) {
+          sentenceDetails[i].secondsLeft = parseInt(
+            (new Date(sentenceDetails[i].voteEndTime) - new Date().getTime())/1000);
+        }
+        $scope.sentenceDetailsList = sentenceDetails;
       });
     });
     socket.on('new sentence', function(sentenceId) {
