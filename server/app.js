@@ -108,7 +108,7 @@ function sendDetailsForSentences(sentenceId) {
 
 function gameStart(sentenceId, vote) {
     resetTimer(sentenceId, vote.completedAt);
-    emitGameObject(sentenceId, 'new sentence', sentenceId);
+    emitGameObject(null, 'new sentence', sentenceId);
 }
 
 function voteStart(sentenceId, vote) {
