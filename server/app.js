@@ -102,7 +102,7 @@ function nextRound(sentenceId, word, isGameEnd) {
         mongoUtil.endGame(sentenceId, emitGameObject);
         emitGameObject(sentenceId, 'game end');
     } else {
-        mongoUtil.createNewVote(sentenceId, voteStart);
+        mongoUtil.createNewVote(sentenceId, null, voteStart);
     }
 }
 
