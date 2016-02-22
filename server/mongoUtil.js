@@ -69,14 +69,24 @@ module.exports = {
     },
 
     appendWinningWordToSentence: function(word, sentenceId, callback) {
+    	var _this = this;
         var query = {_id: ObjectID(sentenceId)};
         _db.collection('sentences').find(query).limit(1)
         .next(function(err, sentence){
             console.log("Sentence before append: ", sentence);
             var nextSentence = ((sentence.text) ? sentence.text + " " : "") + word;
-            callback(sentenceId, 'update sentence', nextSentence);
             var update = {$set: {text: nextSentence}};
-            _db.collection('sentences').findOneAndUpdate(query,update, {});
+            _db.collection('sentences').findOneAndUpdate(query,update, {}, function(err, result){
+            	_this.returnUpdatedSentence(sentenceId, callback);
+            });
+        });
+    },
+
+    returnUpdatedSentence: function(sentenceId, callback) {
+        var query = {_id: ObjectID(sentenceId)};
+        _db.collection('sentences').find(query).limit(1)
+        .next(function(err, sentence){
+        	callback(sentenceId, 'update sentence', sentence);
         });
     },
 
