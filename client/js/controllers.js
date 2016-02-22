@@ -39,7 +39,7 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
     $("#form").hide();
     $("#tags").hide();
     $scope.success = false;
-    socket.emit('join sentence', $routeParams.sentenceId);
+    socket.emit('join', $routeParams.sentenceId);
     socket.emit('get game', $routeParams.sentenceId);
     $("#next-word-textbox").focus();
     $scope.submitWord = function(word) {
@@ -50,6 +50,7 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
           console.log("ip is", ip);
           console.log("Word: ", word);
           socket.emit('word submit', word, $routeParams.sentenceId, ip);
+          socket.emit('join', ip);
           $scope.nextWordTextbox = word;
           $scope.success = true;
       }, function(e) {
