@@ -42,11 +42,14 @@ app.controller('HomeController', ['$scope', '$http', '$routeParams', '$window',
     };
   }]);
 
-app.controller('GameController', ['$scope', '$http', '$routeParams',
-  function($scope, $http, $routeParams) {
+app.controller('GameController', ['$scope', '$timeout', '$http', '$routeParams',
+  function($scope, $timeout, $http, $routeParams) {
     var socket = io();
     console.log("called game controller");
     $scope.wordSubmitted = false;
+    //Initialize to 30 seconds from now
+    $scope.voteEndTime = new Date(new Date().getTime() + 30000);
+    timer($scope, $timeout);
     socket.emit('join', $routeParams.sentenceId);
     socket.emit('get sentence', $routeParams.sentenceId);
     $("#next-word-textbox").focus();
@@ -87,19 +90,20 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
         $scope.words = shuffle(words);
       });
     });
-    socket.on('vote start', function() {
-      console.log("Vote start!");
+    socket.on('vote start', function(vote) {
+      console.log("Vote start!", vote);
 
       //Reopen everything
       $scope.$apply(function() {
         $scope.words = [];
         $scope.wordSubmitted = false;
+        $scope.voteEndTime = vote.completedAt;
       });
     });
     socket.on('sentence', function(sentence) {
       $scope.$apply(function() {
         $scope.sentence = sentence.text + " ";
-        console.log("Setnece is ", sentence);
+        console.log("Sentnece is ", sentence);
         $scope.gameEnded = sentence.completedAt != null;
       });
     });
@@ -113,11 +117,27 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
       if (vote) {
         $scope.$apply(function() {
           $scope.vote = vote.text + " ";
+          $scope.voteEndTime = vote.completedAt;
         });
       }
     });
 }]);
 
+function timer($scope,$timeout) {
+    $scope.onTimeout = function(){
+        $scope.timeRemaining = parseInt((new Date($scope.voteEndTime) - new Date().getTime())/1000);
+        if ($scope.timeRemaining < 0) {
+          $scope.timeRemaining = 0;
+          $scope.stopTimer();
+        }
+        mytimeout = $timeout($scope.onTimeout,900);
+    }
+    var mytimeout = $timeout($scope.onTimeout,900);
+
+    $scope.stopTimer = function(){
+        $timeout.cancel(mytimeout);
+    }
+}
 function shuffle(array) {
   var currentIndex = array.length, temporaryValue, randomIndex;
 

@@ -1,8 +1,8 @@
 <div ng-controller="GameController" class="container">
   <div class="row" style="margin-top: 5%">
-      <h1>{{title}}</h1>
+      <h4 ng-show="!gameEnded">{{timeRemaining?timeRemaining:''}} {{timeRemaining?'seconds remaining to vote for the next word':' '}}</h4>
   </div>
-  <div class="row" style="margin-top: 25%">
+  <div class="row" style="margin-top: 10%">
       <h1>{{sentence}}<span id="next-word" ng-class="{'green':wordForm.nextWordTextbox.$valid,'pink':!wordForm.nextWordTextbox.$valid}">{{nextWordTextbox}}</span></h1>
   </div>
 
@@ -16,7 +16,7 @@
   </div>
 
   <div class="row message green" ng-show="wordSubmitted">
-    Your word has been submitted! Wait another 30 seconds to try and play the next word.
+    Your word has been submitted! Wait for the next round to begin to enter the next word.
   </div>
 
   <div class="row message pink" ng-show="gameEnded">
