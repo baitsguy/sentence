@@ -58,6 +58,7 @@ app.controller('GameController', ['$scope', '$timeout', '$http', '$routeParams',
   function($scope, $timeout, $http, $routeParams) {
     var socket = io();
     console.log("called game controller");
+    $timeout(function() { $('#nextWordTextbox').focus(); });
     $scope.wordSubmitted = false;
     //Initialize to 30 seconds from now
     $scope.voteEndTime = new Date(new Date().getTime() + 30000);
@@ -111,6 +112,8 @@ app.controller('GameController', ['$scope', '$timeout', '$http', '$routeParams',
         $scope.wordSubmitted = false;
         $scope.voteEndTime = vote.completedAt;
         $scope.nextWordTextbox = "";
+        $timeout(function() { $('#nextWordTextbox').focus(); });
+
       });
     });
     socket.on('sentence', function(sentence) {
