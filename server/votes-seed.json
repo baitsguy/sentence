@@ -2,6 +2,7 @@
 	{
 		"_id" : ObjectId("56c8a05875525ebb34ae9d57"),
 		"sentence_id" : ObjectId("56c85b9775525ebb34ae9d55"),
-		"createdAt" : ISODate("2016-02-20T17:20:24.403Z")
+		"createdAt" : ISODate("2016-02-20T17:20:24.403Z"),
+		"completedAt" : ISODate("2016-02-20T17:22:24.403Z")
 	}
 ]
