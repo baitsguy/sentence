@@ -6,10 +6,7 @@
       </div>
     </div>
     <div class="row sentence-list" style="margin-top:10%; margin-bottom:0px;">
-      <label>
-        <input type="checkbox" ng-model="listOnlyActiveSentences" ng-change="listOnlyActiveSentencesChange()">
-        <span class="subtle">Show only active games</span>
-      </label>
+      <a href="" class="subtle"ng-click="flipList()">{{listActiveSentences? 'Show inactive games': 'Show active games'}}</a>
 
       <div class="sentence-row" ng:repeat="(index, value) in sentenceTextList">
         <a ng-href="/game/{{value._id}}">

@@ -4,8 +4,8 @@ app.controller('HomeController', ['$scope', '$http', '$routeParams', '$window',
   function($scope, $http, $routeParams, $window) {
     var socket = io();
     console.log("called home controller");
-    socket.emit('get all sentences');
-    $scope.listOnlyActiveSentences = false;
+    socket.emit('get sentences');
+    $scope.listActiveSentences = true;
     socket.on('sentences', function(sentences) {
       $scope.$apply(function() {
         $scope.sentenceTextList = sentences;
@@ -32,8 +32,9 @@ app.controller('HomeController', ['$scope', '$http', '$routeParams', '$window',
             "off the internet.");
       });
     };
-    $scope.listOnlyActiveSentencesChange = function() {
-      if ($scope.listOnlyActiveSentences==true) {
+    $scope.flipList = function() {
+      $scope.listActiveSentences = !$scope.listActiveSentences;
+      if ($scope.listActiveSentences) {
         socket.emit('get sentences');
       } else {
         socket.emit('get all sentences');
@@ -46,7 +47,6 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
     var socket = io();
     console.log("called game controller");
     $scope.wordSubmitted = false;
-    $scope.activeGame = false;
     socket.emit('join', $routeParams.sentenceId);
     socket.emit('get sentence', $routeParams.sentenceId);
     $("#next-word-textbox").focus();
@@ -99,6 +99,8 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
     socket.on('sentence', function(sentence) {
       $scope.$apply(function() {
         $scope.sentence = sentence.text + " ";
+        console.log("Setnece is ", sentence);
+        $scope.gameEnded = sentence.completedAt != null;
       });
     });
     socket.on('update sentence', function(sentence) {
@@ -111,7 +113,6 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
       if (vote) {
         $scope.$apply(function() {
           $scope.vote = vote.text + " ";
-          $scope.activeGame = true;
         });
       }
     });
