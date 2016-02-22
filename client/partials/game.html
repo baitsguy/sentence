@@ -3,7 +3,7 @@
       <h4 ng-show="!gameEnded">{{timeRemaining?timeRemaining:''}} {{timeRemaining?'seconds remaining to vote for the next word':' '}}</h4>
   </div>
   <div class="row" style="margin-top: 10%">
-      <h1>{{sentence}}<span id="next-word" ng-class="{'green':wordForm.nextWordTextbox.$valid,'pink':!wordForm.nextWordTextbox.$valid}">{{nextWordTextbox}}</span></h1>
+      <h1 id="sentence">{{sentence}}<span id="next-word" ng-class="{'green':wordForm.nextWordTextbox.$valid,'pink':!wordForm.nextWordTextbox.$valid}">{{nextWordTextbox}}</span></h1>
   </div>
 
   <div id="form" class="row" style="margin-top: 10%" ng-show="!wordSubmitted && !gameEnded">
@@ -19,8 +19,8 @@
     Your word has been submitted! Wait for the next round to begin to enter the next word.
   </div>
 
-  <div class="row message pink" ng-show="gameEnded">
-    This game has ended.
+  <div class="row message blue" ng-show="gameEnded">
+    This game has ended. <a href="/sentences">Click here </a> to go back to view open games.
   </div>
 
  <div id="tags" class="row" style="margin-top: 10%" ng-show="!gameEnded">
