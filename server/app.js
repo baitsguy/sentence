@@ -101,7 +101,6 @@ function nextRound(sentenceId, word, isGameEnd) {
     if (isGameEnd) {
         mongoUtil.endGame(sentenceId, emitGameObject);
         emitGameObject(sentenceId, 'game end');
-        mongoUtil.getSentences(true, emitGameObject);
     } else {
         mongoUtil.createNewVote(sentenceId, null, voteStart);
     }

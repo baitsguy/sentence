@@ -91,6 +91,7 @@ module.exports = {
     },
 
     endGame: function(sentenceId, callback) {
+        var _this = this;
         console.log("Ending game");
         var query = { _id: ObjectID(sentenceId) };
         var update = {$set: {completedAt: new Date()}};
@@ -100,6 +101,7 @@ module.exports = {
             }
             console.log("Doc is: ", sentence.value);
             callback(sentenceId, 'update sentence', sentence.value);
+            _this.getSentences(true, callback);
         });
     },
 
