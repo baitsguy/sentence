@@ -126,7 +126,7 @@ app.controller('GameController', ['$scope', '$timeout', '$http', '$routeParams',
         $scope.sentence = sentence.text + " ";
         console.log("Sentnece is ", sentence);
         $scope.gameEnded = sentence.completedAt != null
-        angular.element('#sentence').css('font-size', Math.max(3, 100/sentence.text.length) +"em");
+        angular.element('#sentence').css('font-size', Math.min(10, Math.max(3, 100/sentence.text.length)) +"em");
       });
     });
     socket.on('update sentence', function(sentence) {
