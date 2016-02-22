@@ -38,18 +38,20 @@ io.on('connection', function(socket){
         socket.join(roomName);
     });
 
-
     socket.on('get sentences', function() {
         mongoUtil.getSentences(true, emitGameObject);
     });
 
     socket.on('create sentence', function(ip){
         socket.join(ip);
-        console.log("creating a game");
         mongoUtil.createSentence(ip, gameStart);
     });
 
-    socket.on('get game', function(sentenceId){
+    socket.on('get all sentences', function() {
+        mongoUtil.getSentences(false, emitGameObject);
+    });
+
+    socket.on('get sentence', function(sentenceId){
         console.log("starting game");
         sendDetailsForSentences(sentenceId);
     });

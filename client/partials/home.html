@@ -1,21 +1,24 @@
 <div ng-controller="HomeController" class="container">
-    <div class="row" style="margin-top: 5%; text-align:right;">
-        <h4>SENTENCIFY</h4>
-      <form class="form" name="newSentenceForm" ng-submit="createGame()">
-        <input class="btn" type="submit" value="Create Sentence" />
-      </form>
+    <div class="row header" style="margin-top: 5%;">
+      <div class="one-half column"><h3>SENTENCIFY</h3></div>
+      <div class="one-half column" style="text-align:right;padding-top:2%;">
+        <a href="" class="header-link" ng-click="createGame()">Create a new sentence</a>
+      </div>
     </div>
-    
-    <div class="row">
-    </div>
+    <div class="row sentence-list" style="margin-top:10%; margin-bottom:0px;">
+      <label>
+        <input type="checkbox" ng-model="listOnlyActiveSentences" ng-change="listOnlyActiveSentencesChange()">
+        <span class="subtle">Show only active games</span>
+      </label>
 
-    <div class="row sentence-row" ng:repeat="(index, value) in sentenceTextList">
-      <a ng-href="/game/{{value._id}}">
-        <div class="row">
-          <h2>{{value.text}}</h2>
-        <p>10 seconds left</p>
-        </div>
-      </a>
-    
+      <div class="sentence-row" ng:repeat="(index, value) in sentenceTextList">
+        <a ng-href="/game/{{value._id}}">
+          <div class="row">
+            <h2>{{value.text}}</h2>
+          <p>10 seconds left</p>
+          </div>
+        </a>
+      
+      </div>
     </div>
   </div>

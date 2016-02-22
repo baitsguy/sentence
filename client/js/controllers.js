@@ -4,8 +4,8 @@ app.controller('HomeController', ['$scope', '$http', '$routeParams', '$window',
   function($scope, $http, $routeParams, $window) {
     var socket = io();
     console.log("called home controller");
-    socket.emit('get sentences');
-    $scope.helloworld = "lala";
+    socket.emit('get all sentences');
+    $scope.listOnlyActiveSentences = false;
     socket.on('sentences', function(sentences) {
       $scope.$apply(function() {
         $scope.sentenceTextList = sentences;
@@ -16,43 +16,51 @@ app.controller('HomeController', ['$scope', '$http', '$routeParams', '$window',
         $scope.sentenceTextList.push({value:sentenceId});
       });
     });
+    socket.on('new sentence callback', function(sentenceId) {
+      $window.location.href = '/game/' + sentenceId;
+    });
 
     $scope.createGame = function() {
       var json = 'http://ipv4.myexternalip.com/json';
       $http.get(json).then(function(result) {
-        var ip = "none";
-        ip = result.data.ip;
-        socket.emit('create sentence', ip);
+          var ip = "none";
+          ip = result.data.ip;
+          socket.emit('create sentence', ip);
       }, function(e) {
-        alert("Error in determining your session context." +
+          alert("Error in determining your session context." +
             "Check to make sure you don't have a firewall blocking " +
             "off the internet.");
       });
+    };
+    $scope.listOnlyActiveSentencesChange = function() {
+      if ($scope.listOnlyActiveSentences==true) {
+        socket.emit('get sentences');
+      } else {
+        socket.emit('get all sentences');
+      }
     };
   }]);
 
 app.controller('GameController', ['$scope', '$http', '$routeParams',
   function($scope, $http, $routeParams) {
-    //var socket = io($routeParams.sentenceId);
     var socket = io();
     console.log("called game controller");
-    $("#form").hide();
-    $("#tags").hide();
-    $scope.success = false;
+    $scope.wordSubmitted = false;
+    $scope.activeGame = false;
     socket.emit('join', $routeParams.sentenceId);
-    socket.emit('get game', $routeParams.sentenceId);
+    socket.emit('get sentence', $routeParams.sentenceId);
     $("#next-word-textbox").focus();
     $scope.submitWord = function(word) {
       var json = 'http://ipv4.myexternalip.com/json';
-      var ip = "none";
       $http.get(json).then(function(result) {
+          var ip = "none";
           ip = result.data.ip;
           console.log("ip is", ip);
           console.log("Word: ", word);
           socket.emit('word submit', word, $routeParams.sentenceId, ip);
           socket.emit('join', ip);
           $scope.nextWordTextbox = word;
-          $scope.success = true;
+          $scope.wordSubmitted = true;
       }, function(e) {
           alert("Error in determining your session context." +
             "Check to make sure you don't have a firewall blocking " +
@@ -80,21 +88,12 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
       });
     });
     socket.on('vote start', function() {
+      console.log("Vote start!");
+
       //Reopen everything
       $scope.$apply(function() {
         $scope.words = [];
-        $("#form").show();
-        $("#tags").show();
-        $scope.success = false;
-      });
-    });
-    socket.on('vote start', function() {
-      //Reopen everything
-      $scope.$apply(function() {
-        $scope.words = [];
-        $("#form").show();
-        $("#tags").show();
-        $scope.success = false;
+        $scope.wordSubmitted = false;
       });
     });
     socket.on('sentence', function(sentence) {
@@ -112,8 +111,7 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
       if (vote) {
         $scope.$apply(function() {
           $scope.vote = vote.text + " ";
-          $("#form").show();
-          $("#tags").show();
+          $scope.activeGame = true;
         });
       }
     });

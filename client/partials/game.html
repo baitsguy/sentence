@@ -6,7 +6,7 @@
       <h1>{{sentence}}<span id="next-word" ng-class="{'green':wordForm.nextWordTextbox.$valid,'pink':!wordForm.nextWordTextbox.$valid}">{{nextWordTextbox}}</span></h1>
   </div>
 
-  <div id="form" class="row" style="margin-top: 10%">
+  <div id="form" class="row" style="margin-top: 10%" ng-show="!wordSubmitted && activeGame">
       <form name="wordForm" ng-submit="wordForm.$valid && submitWord(nextWordTextbox)">
         <input class="u-full-width" name="nextWordTextbox" type="text" placeholder="Enter a word" ng-model="nextWordTextbox" required ng-pattern="/()(^\s*\S+\s*$)/" id="nextWordTextbox">
         <div class="row message" ng-class="{'pink':!wordForm.nextWordTextbox.$valid}" ng-show="!wordForm.nextWordTextbox.$valid && !wordForm.nextWordTextbox.$pristine">
@@ -15,11 +15,11 @@
       </form>
   </div>
 
-  <div class="row message" ng-class="{'green':success}" ng-show="success">
-    Your word has been submitted! Wait another 10 seconds to try and play the next word.
+  <div class="row message green" ng-show="wordSubmitted">
+    Your word has been submitted! Wait another 30 seconds to try and play the next word.
   </div>
 
- <div id="tags" class="row" style="margin-top: 10%">
+ <div id="tags" class="row" style="margin-top: 10%" ng-show="activeGame">
   <span ng:repeat="(index, value) in words">
       <span class="tag" style="font-size: {{value.size}}em"><a href="" ng-click="submitWord(value.word)">{{value.word}}</a></span>
   </span>
