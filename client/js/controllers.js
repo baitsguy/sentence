@@ -99,11 +99,13 @@ app.controller('GameController', ['$scope', '$http', '$routeParams',
     });
     socket.on('vote', function(vote) {
       console.log("Got votes: ", vote);
-      $scope.$apply(function() {
-        $scope.vote = vote.text + " ";
-        $("#form").show();
-        $("#tags").show();
-      });
+      if (vote) {
+        $scope.$apply(function() {
+          $scope.vote = vote.text + " ";
+          $("#form").show();
+          $("#tags").show();
+        });
+      }
     });
 }]);
 

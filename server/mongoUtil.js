@@ -94,12 +94,12 @@ module.exports = {
         console.log("Ending game");
         var query = { _id: ObjectID(sentenceId) };
         var update = {$set: {completedAt: new Date()}};
-        _db.collection('sentences').findAndModify(query, [], update, {}, function(err, doc){
+        _db.collection('sentences').findAndModify(query, [], update, {}, function(err, sentence){
             if (err) {
                 console.log(err);
             }
-            console.log("Doc is: ", doc.value.text);
-            callback(sentenceId, 'update sentence', doc.value.text);
+            console.log("Doc is: ", sentence.value);
+            callback(sentenceId, 'update sentence', sentence.value);
         });
     },
 
