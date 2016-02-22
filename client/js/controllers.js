@@ -1,7 +1,7 @@
 var app = angular.module('sentencifyControllers', ['ngRoute']);
 
-app.controller('HomeController', ['$scope', '$routeParams', '$window',
-  function($scope, $routeParams, $window) {
+app.controller('HomeController', ['$scope', '$http', '$routeParams', '$window',
+  function($scope, $http, $routeParams, $window) {
     var socket = io();
     console.log("called home controller");
     socket.emit('get sentences');
@@ -18,9 +18,18 @@ app.controller('HomeController', ['$scope', '$routeParams', '$window',
     });
 
     $scope.createGame = function() {
-      socket.emit('create game');
+      var json = 'http://ipv4.myexternalip.com/json';
+      $http.get(json).then(function(result) {
+        var ip = "none";
+        ip = result.data.ip;
+        socket.emit('create sentence', ip);
+      }, function(e) {
+        alert("Error in determining your session context." +
+            "Check to make sure you don't have a firewall blocking " +
+            "off the internet.");
+      });
     };
-}]);
+  }]);
 
 app.controller('GameController', ['$scope', '$http', '$routeParams',
   function($scope, $http, $routeParams) {

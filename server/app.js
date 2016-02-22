@@ -34,17 +34,19 @@ app.get("/game/:sentenceId", function(request, response) {
 
 io.on('connection', function(socket){
 
-    socket.on('join sentence', function(sentenceId) {
-        socket.join(sentenceId);
+    socket.on('join', function(roomName) {
+        socket.join(roomName);
     });
+
 
     socket.on('get sentences', function() {
         mongoUtil.getSentences(true, emitGameObject);
     });
 
-    socket.on('create game', function(){
+    socket.on('create sentence', function(ip){
+        socket.join(ip);
         console.log("creating a game");
-        mongoUtil.createSentence(gameStart);
+        mongoUtil.createSentence(ip, gameStart);
     });
 
     socket.on('get game', function(sentenceId){
@@ -106,9 +108,10 @@ function sendDetailsForSentences(sentenceId) {
     mongoUtil.getSentenceDetails(sentenceId, emitGameObject);
 }
 
-function gameStart(sentenceId, vote) {
+function gameStart(sentenceId, vote, ip) {
     resetTimer(sentenceId, vote.completedAt);
     emitGameObject(null, 'new sentence', sentenceId);
+    emitGameObject(ip, 'new sentence callback', sentenceId);
 }
 
 function voteStart(sentenceId, vote) {

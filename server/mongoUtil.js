@@ -38,7 +38,7 @@ module.exports = {
 	    _db.collection('votes').findOneAndUpdate(query, update, {});
     },
 
-    createNewVote: function(sentenceId, callback) {
+    createNewVote: function(sentenceId, ip, callback) {
         var _this = this;
     	var voteEndDate = scheduler.getNextVoteEnd();
     	var data = { sentence_id: ObjectID(sentenceId), createdAt: new Date(), completedAt: voteEndDate};
@@ -46,25 +46,25 @@ module.exports = {
             if (err) {
                 console.log(err);
             }
-            _this.findInsertedVote(sentenceId, result.insertedId, callback);
+            _this.findInsertedVote(sentenceId, result.insertedId, ip, callback);
         });
     },
 
-    findInsertedVote: function(sentenceId, voteId, callback) {
+    findInsertedVote: function(sentenceId, voteId, ip, callback) {
         _db.collection('votes').find({_id: voteId})
         .next(function(err, vote){
             console.log("Result of insert: ", vote);
-            callback(sentenceId, vote);
+            callback(sentenceId, vote, ip);
         });
     },
 
-    createSentence: function(callback) {
+    createSentence: function(ip, callback) {
         var _this = this;
         _db.collection('sentences').insertOne({createdAt: new Date(), text: ''}, function(err, result){
             if (err) {
                 console.log(err);
             }
-            _this.createNewVote(result.insertedId, callback);
+            _this.createNewVote(result.insertedId, ip, callback);
         });
     },
 
