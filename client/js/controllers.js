@@ -10,6 +10,7 @@ app.controller('AboutController', ['$scope', '$http','$window',
 app.controller('HomeController', ['$scope', '$http', '$routeParams', '$window',
   function($scope, $http, $routeParams, $window) {
     var socket = io();
+    $scope.formVisible = false;
     console.log("called home controller");
     socket.emit('get sentences');
     $scope.listActiveSentences = true;
@@ -32,12 +33,16 @@ app.controller('HomeController', ['$scope', '$http', '$routeParams', '$window',
       $window.location.href = '/game/' + sentenceId;
     });
 
-    $scope.createGame = function() {
+    $scope.createGame = function(period) {
+      if (period <= 0 || period == null) {
+        period = 30;
+      }
+      console.log("period", period);
       var json = 'http://ipv4.myexternalip.com/json';
       $http.get(json).then(function(result) {
           var ip = "none";
           ip = result.data.ip;
-          socket.emit('create sentence', ip);
+          socket.emit('create sentence', period, ip);
       }, function(e) {
           alert("Error in determining your session context." +
             "Check to make sure you don't have a firewall blocking " +
