@@ -157,15 +157,15 @@ module.exports = {
         this.getVote(sentenceId, callback);
     },
 
-    submitWord: function(sentenceId, word, ip, callback) {
+    submitWord: function(sentenceId, word, ip, callback, voterCallback) {
         var _this = this;
         _db.collection('votes').find({ sentence_id: ObjectID(sentenceId), voteDone: {$exists: false}})
         .next(function(err, vote){
-            _this.checkVoter(sentenceId, vote._id, word, ip, callback);
+            _this.checkVoter(sentenceId, vote._id, word, ip, callback, voterCallback);
         });
     },
 
-    checkVoter: function(sentenceId, voteId, word, ip, callback) {
+    checkVoter: function(sentenceId, voteId, word, ip, callback, voterCallback) {
         var _this = this;
         var query = {vote_id: voteId, ip: ip};
         _db.collection('voters').find(query).next(function(err, voter) {
@@ -174,6 +174,7 @@ module.exports = {
             }
            console.log('voter: ', voter);
             if(voter) {
+                voterCallback(ip, 'already voted');
                 callback(sentenceId);
             } else {
                 _this.insertWord(sentenceId, voteId, word, ip, callback);
