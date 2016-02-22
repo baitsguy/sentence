@@ -114,7 +114,7 @@ function gameStart(sentenceId, vote, ip) {
     emitGameObject(ip, 'new sentence callback', sentenceId);
 }
 
-function voteStart(sentenceId, vote) {
+function voteStart(sentenceId, vote, ip) {
     resetTimer(sentenceId, vote.completedAt);
     emitGameObject(sentenceId, 'vote start', vote);
 }
