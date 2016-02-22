@@ -42,13 +42,14 @@ io.on('connection', function(socket){
         mongoUtil.getSentences(true, emitGameObject);
     });
 
-    socket.on('create sentence', function(ip){
+    socket.on('create sentence', function(voteLength, ip){
         socket.join(ip);
-        mongoUtil.createSentence(ip, gameStart);
+        mongoUtil.createSentence(ip, voteLength, gameStart);
     });
 
-    socket.on('get all sentences', function() {
-        mongoUtil.getSentences(false, emitGameObject);
+    socket.on('get all sentences', function(ip) {
+        socket.join(ip);
+        mongoUtil.getSentences(false, createRoomEmit(ip));
     });
 
     socket.on('get sentence', function(sentenceId){
@@ -102,7 +103,7 @@ function nextRound(sentenceId, word, isGameEnd) {
         mongoUtil.endGame(sentenceId, emitGameObject);
         emitGameObject(sentenceId, 'game end');
     } else {
-        mongoUtil.createNewVote(sentenceId, null, voteStart);
+        mongoUtil.newVote(sentenceId, null, voteStart);
     }
 }
 
@@ -120,4 +121,16 @@ function voteStart(sentenceId, vote, ip) {
     resetTimer(sentenceId, vote.completedAt);
     emitGameObject(sentenceId, 'vote start', vote);
     mongoUtil.getSentences(true, emitGameObject);
+}
+
+function createRoomEmit(roomName) {
+    return function(placeHolder, objTypeStr, object) {
+        var emitter = io.to(roomName);
+        console.log(objTypeStr + ((object) ? " object: " : ""), object);
+        if (object) {
+            emitter.emit(objTypeStr, object);
+        } else {
+            emitter.emit(objTypeStr);
+        }
+    };
 }

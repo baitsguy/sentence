@@ -38,9 +38,18 @@ module.exports = {
 	    _db.collection('votes').findOneAndUpdate(query, update, {});
     },
 
-    createNewVote: function(sentenceId, ip, callback) {
+    newVote: function(sentenceId, ip, callback) {
         var _this = this;
-    	var voteEndDate = scheduler.getNextVoteEnd();
+        var query = {_id: ObjectID(sentenceId)};
+        _db.collection('sentences').find(query).limit(1)
+            .next(function(err, sentence){
+                _this.createNewVote(sentenceId, sentence.voteLength, null, callback);
+            });
+    },
+
+    createNewVote: function(sentenceId, voteLength, ip, callback) {
+        var _this = this;
+    	var voteEndDate = scheduler.getNextVoteEnd(voteLength);
     	var data = { sentence_id: ObjectID(sentenceId), createdAt: new Date(), completedAt: voteEndDate};
         _db.collection('votes').insertOne(data, function(err, result){
             if (err) {
@@ -58,13 +67,13 @@ module.exports = {
         });
     },
 
-    createSentence: function(ip, callback) {
+    createSentence: function(ip, voteLength, callback) {
         var _this = this;
-        _db.collection('sentences').insertOne({createdAt: new Date(), text: ''}, function(err, result){
+        _db.collection('sentences').insertOne({createdAt: new Date(), text: '', voteLength: voteLength}, function(err, result){
             if (err) {
                 console.log(err);
             }
-            _this.createNewVote(result.insertedId, ip, callback);
+            _this.createNewVote(result.insertedId, voteLength, ip, callback);
         });
     },
 
