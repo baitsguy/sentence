@@ -38,7 +38,6 @@ io.on('connection', function(socket){
         socket.join(roomName);
     });
 
-
     socket.on('get sentences', function() {
         mongoUtil.getSentences(true, emitGameObject);
     });
@@ -52,7 +51,7 @@ io.on('connection', function(socket){
         mongoUtil.getSentences(false, emitGameObject);
     });
 
-    socket.on('get game', function(sentenceId){
+    socket.on('get sentence', function(sentenceId){
         console.log("starting game");
         sendDetailsForSentences(sentenceId);
     });

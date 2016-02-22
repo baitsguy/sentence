@@ -16,6 +16,9 @@ app.controller('HomeController', ['$scope', '$http', '$routeParams', '$window',
         $scope.sentenceTextList.push({value:sentenceId});
       });
     });
+    socket.on('new sentence callback', function(sentenceId) {
+      $window.location.href = '/game/' + sentenceId;
+    });
 
     $scope.createGame = function() {
       var json = 'http://ipv4.myexternalip.com/json';
@@ -40,13 +43,12 @@ app.controller('HomeController', ['$scope', '$http', '$routeParams', '$window',
 
 app.controller('GameController', ['$scope', '$http', '$routeParams',
   function($scope, $http, $routeParams) {
-    //var socket = io($routeParams.sentenceId);
     var socket = io();
     console.log("called game controller");
     $scope.wordSubmitted = false;
     $scope.activeGame = false;
-    socket.emit('join sentence', $routeParams.sentenceId);
-    socket.emit('get game', $routeParams.sentenceId);
+    socket.emit('join', $routeParams.sentenceId);
+    socket.emit('get sentence', $routeParams.sentenceId);
     $("#next-word-textbox").focus();
     $scope.submitWord = function(word) {
       var json = 'http://ipv4.myexternalip.com/json';
