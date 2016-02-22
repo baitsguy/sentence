@@ -7,6 +7,35 @@ h1 {
 h1, h2, h3, h4 {
   font-family: Lora;
 }
+a {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+.header {
+  border-bottom: solid 1px #bbb;
+}
+a.header-link {
+  font-family: Lora;
+  text-decoration: none;
+  color:#444;
+  font-size:1em;
+  font-weight:400;
+}
+.subtle {
+  font-family: Lora;
+  text-decoration: none;
+  color:#888;
+  font-size:1em;
+  font-weight:400;
+}
+.subtle:hover {
+  text-decoration: underline;
+}
+span.subtle {
+  margin-left:5px;
+}
 .tag a {
   font-family: Lora;
   text-decoration: none;
@@ -22,7 +51,7 @@ h1, h2, h3, h4 {
 }
 .sentence-row {
   padding:1em;
-  margin-top:5%;  
+  margin-bottom:5%;  
   border-bottom: solid 1px #dddddd;
 }
 .sentence-row:hover {

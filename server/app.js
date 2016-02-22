@@ -45,8 +45,11 @@ io.on('connection', function(socket){
 
     socket.on('create sentence', function(ip){
         socket.join(ip);
-        console.log("creating a game");
         mongoUtil.createSentence(ip, gameStart);
+    });
+
+    socket.on('get all sentences', function() {
+        mongoUtil.getSentences(false, emitGameObject);
     });
 
     socket.on('get game', function(sentenceId){
