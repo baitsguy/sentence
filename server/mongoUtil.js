@@ -73,7 +73,7 @@ module.exports = {
         _db.collection('sentences').find(query).limit(1)
         .next(function(err, sentence){
             console.log("Sentence before append: ", sentence);
-            var nextSentence = sentence.text + " " + word;
+            var nextSentence = ((sentence.text) ? sentence.text + " " : "") + word;
             callback(sentenceId, 'update sentence', nextSentence);
             var update = {$set: {text: nextSentence}};
             _db.collection('sentences').findOneAndUpdate(query,update, {});
