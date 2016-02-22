@@ -119,4 +119,5 @@ function gameStart(sentenceId, vote, ip) {
 function voteStart(sentenceId, vote, ip) {
     resetTimer(sentenceId, vote.completedAt);
     emitGameObject(sentenceId, 'vote start', vote);
+    mongoUtil.getSentences(true, emitGameObject);
 }
